@@ -1,0 +1,230 @@
+# MDPE + AI Design Patterns + AI-Native Workflow
+
+## 🎯 Objective
+This project follows a structured AI-driven development approach combining:
+
+- MDPE (Model, Data, Prompt, Evaluation)
+- AI Design Patterns
+- AI-Native Development Workflow
+
+Goal:
+Build scalable, well-structured software using AI as a co-architect.
+
+---
+
+# 🧠 CORE METHODOLOGIES
+
+## MDPE
+- Model
+- Data
+- Prompt
+- Evaluation
+
+## AI Design Patterns
+- Prompt → Spec → Code
+- Iterative Refinement
+- Component-First
+- AI as Architect
+
+## AI-Native Workflow
+- Discovery
+- Transformation
+- Waves
+- Iteration
+
+---
+
+# 🔍 1. DISCOVERY (ALWAYS FIRST)
+
+Understand BEFORE building.
+
+Tasks:
+- Define problem
+- Define users (student, teacher)
+- Define user flows
+- Define features
+
+Rules:
+- NEVER start coding without discovery
+- ALWAYS clarify requirements with AI
+- Prefer diagrams, flows, and descriptions
+
+---
+
+# 🔄 2. TRANSFORMATION
+
+Turn ideas into structured assets.
+
+Tasks:
+- Wireframes
+- Data models
+- API contracts
+- Business rules
+
+Rules:
+- ALWAYS create specs before code
+- Use Prompt → Spec → Code
+- Keep outputs structured
+
+---
+
+# 🌊 3. WAVES (FEATURE DELIVERY)
+
+Build in small, complete increments.
+
+Each wave must:
+- Be functional
+- Be testable
+- Deliver value
+
+Examples:
+- Wave 1 → Auth
+- Wave 2 → Assignments
+- Wave 3 → Content
+
+Rules:
+- NEVER build everything at once
+- Focus on one feature per wave
+- Each wave must be usable
+
+---
+
+# 🔁 4. ITERATION (CONTINUOUS)
+
+Improve constantly.
+
+Loop:
+1. Generate
+2. Evaluate
+3. Refine
+4. Regenerate
+
+Rules:
+- NEVER accept first output blindly
+- ALWAYS refine prompts
+- Prefer small improvements
+
+---
+
+# 🧠 AI AS ARCHITECT
+
+Before coding:
+
+- Define architecture
+- Define data structures
+- Define flows
+
+Rules:
+- ALWAYS design first
+- NEVER jump directly to code
+
+---
+
+# 🧩 COMPONENT-FIRST
+
+Break into small parts.
+
+Rules:
+- UI → components (card, list, header)
+- Backend → model, service, view
+- Prefer modular design
+
+---
+
+# 🧾 PROMPT → SPEC → CODE
+
+MANDATORY FLOW:
+
+1. Prompt
+2. Spec
+3. Code
+
+Rules:
+- NEVER skip spec
+- Code must follow spec strictly
+
+---
+
+# 📊 MDPE INTEGRATION
+
+## MODEL
+- Use AI as collaborator
+- Validate outputs
+
+## DATA
+- Use all available context
+- Reuse patterns
+- Ask if missing
+
+## PROMPT
+- Be structured
+- Include constraints
+
+## EVALUATION
+
+Checklist:
+- Correct?
+- Scalable?
+- Clean?
+- Consistent?
+
+If not:
+→ iterate
+
+---
+
+# 🔁 STANDARD DEVELOPMENT FLOW
+
+1. Discovery
+2. Architecture (AI)
+3. Transformation (specs, wireframes)
+4. Break into components
+5. Prompt → Spec → Code
+6. Evaluate
+7. Iterate
+8. Deliver wave
+
+---
+
+# 🚫 ANTI-PATTERNS
+
+Avoid:
+
+- Coding without discovery
+- Skipping spec
+- Large unstructured prompts
+- Generating full systems at once
+- Blind copy-paste
+
+---
+
+# ✅ BEST PRACTICES
+
+- Small iterations
+- Reusable prompts
+- AI code review
+- Generate tests when needed
+- Think in systems
+
+---
+
+# 🧠 MINDSET
+
+You are:
+
+- Designing with AI
+- Architecting with AI
+- Building with AI
+- Iterating with AI
+
+AI is your co-architect.
+
+---
+
+# 📌 FINAL RULE
+
+If something feels wrong:
+
+STOP  
+Refine prompt  
+Iterate  

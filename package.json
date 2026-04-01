@@ -1,0 +1,20 @@
+{
+  "name": "rema",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @rema/web",
+    "dev:mobile": "npm run start --workspace @rema/mobile",
+    "dev:api": "./apps/api/.venv/bin/python ./apps/api/manage.py runserver 0.0.0.0:8000",
+    "docker:up": "docker compose -f infra/docker/docker-compose.yml up --build",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "next": "^16.2.2"
+  }
+}

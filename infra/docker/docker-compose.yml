@@ -1,0 +1,39 @@
+name: rema
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: rema-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rema}
+      POSTGRES_USER: ${POSTGRES_USER:-rema}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rema}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rema} -d ${POSTGRES_DB:-rema}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+    container_name: rema-api
+    env_file:
+      - ../../.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rema}:${POSTGRES_PASSWORD:-rema}@postgres:5432/${POSTGRES_DB:-rema}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,api
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
