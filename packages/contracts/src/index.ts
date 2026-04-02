@@ -55,9 +55,16 @@ export type {
 export type {
   CommunityAudience,
   CommunityPostSummary,
+  CommunityPostDetail,
+  CreateCommunityPostRequest,
   CommunityModerationStatus,
+  ModerateCommunityPostRequest,
 } from "./community/types";
 
 export type { GameSummary } from "./games/types";
 
-export type { ProfileResponse } from "./profile/types";
+export type {
+  ProfileResponse,
+  UpdateProfileRequest,
+  UpdateAvatarRequest,
+} from "./profile/types";

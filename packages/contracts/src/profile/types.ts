@@ -6,4 +6,15 @@ export interface ProfileResponse {
   displayName: string;
   avatarUrl?: string | null;
   bio?: string | null;
+  preferences?: Record<string, string | boolean | number | null>;
+}
+
+export interface UpdateProfileRequest {
+  displayName: string;
+  bio?: string | null;
+  preferences?: Record<string, string | boolean | number | null>;
+}
+
+export interface UpdateAvatarRequest {
+  avatarUrl: string;
 }

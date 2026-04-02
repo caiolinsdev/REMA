@@ -31,5 +31,6 @@ def user_me_payload(user: User) -> dict[str, Any]:
             "displayName": name,
             "avatarUrl": profile.avatar_url,
             "bio": profile.bio or None,
+            "preferences": profile.preferences or {},
         },
     }

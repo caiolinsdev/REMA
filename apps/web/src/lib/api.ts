@@ -3,17 +3,24 @@ import type {
   ActivitySummary,
   AuthSessionResponse,
   CalendarEventSummary,
+  CommunityPostDetail,
+  CommunityPostSummary,
   ContentDetail,
   ContentSummary,
+  CreateCommunityPostRequest,
   LoginRequest,
   MeResponse,
+  ModerateCommunityPostRequest,
   PersonalCalendarNote,
   ReviewPayload,
+  ProfileResponse,
   SubmissionDetail,
   SubmissionListItem,
   UpsertCalendarEventRequest,
   UpsertContentRequest,
   UpsertPersonalCalendarNoteRequest,
+  UpdateAvatarRequest,
+  UpdateProfileRequest,
   UpsertSubmissionRequest,
   UpsertActivityRequest,
 } from "@rema/contracts";
@@ -261,4 +268,90 @@ export function apiCreateCalendarNote(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+export function apiProfile(token: string): Promise<ProfileResponse> {
+  return authorizedRequest<ProfileResponse>(token, "/profile/");
+}
+
+export function apiUpdateProfile(
+  token: string,
+  body: UpdateProfileRequest,
+): Promise<ProfileResponse> {
+  return authorizedRequest<ProfileResponse>(token, "/profile/", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiUpdateAvatar(
+  token: string,
+  body: UpdateAvatarRequest,
+): Promise<ProfileResponse> {
+  return authorizedRequest<ProfileResponse>(token, "/profile/avatar/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiCommunityPosts(
+  token: string,
+  query?: string,
+): Promise<CommunityPostSummary[]> {
+  return authorizedRequest<CommunityPostSummary[]>(
+    token,
+    `/community/posts/${query ? `?${query}` : ""}`,
+  );
+}
+
+export function apiCommunityPostDetail(
+  token: string,
+  postId: number | string,
+): Promise<CommunityPostDetail> {
+  return authorizedRequest<CommunityPostDetail>(token, `/community/posts/${postId}/`);
+}
+
+export function apiCreateCommunityPost(
+  token: string,
+  body: CreateCommunityPostRequest,
+): Promise<CommunityPostDetail> {
+  return authorizedRequest<CommunityPostDetail>(token, "/community/posts/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiApproveCommunityPost(
+  token: string,
+  postId: number | string,
+  body: ModerateCommunityPostRequest,
+): Promise<CommunityPostDetail> {
+  return authorizedRequest<CommunityPostDetail>(
+    token,
+    `/community/posts/${postId}/approve/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function apiRejectCommunityPost(
+  token: string,
+  postId: number | string,
+  body: ModerateCommunityPostRequest,
+): Promise<CommunityPostDetail> {
+  return authorizedRequest<CommunityPostDetail>(
+    token,
+    `/community/posts/${postId}/reject/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
 }

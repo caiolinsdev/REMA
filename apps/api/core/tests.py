@@ -9,6 +9,7 @@ from core.models import (
     Activity,
     AuthSession,
     CalendarEvent,
+    CommunityPost,
     Content,
     PersonalCalendarNote,
     Review,
@@ -538,3 +539,147 @@ class ContentAndCalendarFlowTests(TestCase):
             reverse("calendar-notes"), **self._auth(self.teacher_session)
         )
         self.assertEqual(teacher_list.status_code, 403)
+
+
+class ProfileAndCommunityFlowTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(
+            username="teacher-community",
+            email="teacher-community@example.com",
+            password="demo123456",
+        )
+        self.teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.teacher.profile.display_name = "Professor Comunidade"
+        self.teacher.profile.save()
+
+        self.student = User.objects.create_user(
+            username="student-community",
+            email="student-community@example.com",
+            password="demo123456",
+        )
+        self.student.profile.role = UserProfile.Role.ALUNO
+        self.student.profile.display_name = "Aluno Comunidade"
+        self.student.profile.save()
+
+        self.teacher_session = AuthSession.objects.create(user=self.teacher)
+        self.student_session = AuthSession.objects.create(user=self.student)
+
+    def _auth(self, session: AuthSession) -> dict[str, str]:
+        return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
+
+    def test_profile_can_be_updated(self):
+        response = self.client.patch(
+            reverse("profile-item"),
+            data=json.dumps(
+                {
+                    "displayName": "Aluno Atualizado",
+                    "preferences": {"theme": "dark"},
+                    "bio": "",
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["displayName"], "Aluno Atualizado")
+        self.assertEqual(response.json()["preferences"]["theme"], "dark")
+
+    def test_student_post_requires_approval_to_enter_student_feed(self):
+        create_response = self.client.post(
+            reverse("community-posts"),
+            data=json.dumps(
+                {
+                    "audience": "alunos",
+                    "title": "Meu post",
+                    "body": "Conteudo do aluno",
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(create_response.status_code, 201)
+        self.assertEqual(create_response.json()["status"], "pending_review")
+        post_id = create_response.json()["id"]
+
+        student_feed_before = self.client.get(
+            reverse("community-posts"), **self._auth(self.student_session)
+        )
+        self.assertEqual(student_feed_before.status_code, 200)
+        self.assertEqual(len(student_feed_before.json()), 0)
+
+        own_posts = self.client.get(
+            f"{reverse('community-posts')}?scope=mine",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(own_posts.status_code, 200)
+        self.assertEqual(len(own_posts.json()), 1)
+        self.assertEqual(own_posts.json()[0]["status"], "pending_review")
+
+        moderation_queue = self.client.get(
+            f"{reverse('community-posts')}?queue=moderation",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(moderation_queue.status_code, 200)
+        self.assertEqual(len(moderation_queue.json()), 1)
+
+        approve_response = self.client.post(
+            reverse("community-post-approve", args=[post_id]),
+            data=json.dumps({"comment": "Aprovado"}),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(approve_response.status_code, 200)
+        self.assertEqual(approve_response.json()["status"], "approved")
+
+        student_feed_after = self.client.get(
+            reverse("community-posts"), **self._auth(self.student_session)
+        )
+        self.assertEqual(student_feed_after.status_code, 200)
+        self.assertEqual(len(student_feed_after.json()), 1)
+
+    def test_teacher_feed_is_private_to_professors(self):
+        create_response = self.client.post(
+            reverse("community-posts"),
+            data=json.dumps(
+                {
+                    "audience": "professores",
+                    "title": "Aviso interno",
+                    "body": "Somente professores",
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(create_response.status_code, 201)
+        self.assertEqual(create_response.json()["status"], "approved")
+
+        teacher_feed = self.client.get(
+            reverse("community-posts"), **self._auth(self.teacher_session)
+        )
+        self.assertEqual(teacher_feed.status_code, 200)
+        self.assertEqual(len(teacher_feed.json()), 1)
+
+        student_feed = self.client.get(
+            reverse("community-posts"), **self._auth(self.student_session)
+        )
+        self.assertEqual(student_feed.status_code, 200)
+        self.assertEqual(len(student_feed.json()), 0)
+
+    def test_teacher_can_reject_student_post(self):
+        post = CommunityPost.objects.create(
+            author=self.student,
+            audience=CommunityPost.Audience.ALUNOS,
+            title="Post pendente",
+            body="Aguardando moderacao",
+            status=CommunityPost.Status.PENDING_REVIEW,
+        )
+
+        reject_response = self.client.post(
+            reverse("community-post-reject", args=[post.id]),
+            data=json.dumps({"comment": "Precisa ajustar o conteudo"}),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+
+        self.assertEqual(reject_response.status_code, 200)
+        self.assertEqual(reject_response.json()["status"], "rejected")

@@ -4,6 +4,9 @@ from core.models import (
     Activity,
     AuthSession,
     CalendarEvent,
+    CommunityApproval,
+    CommunityComment,
+    CommunityPost,
     Content,
     PersonalCalendarNote,
     Question,
@@ -98,3 +101,21 @@ class CalendarEventAdmin(admin.ModelAdmin):
 class PersonalCalendarNoteAdmin(admin.ModelAdmin):
     list_display = ("title", "student", "start_at", "end_at")
     search_fields = ("title", "description", "student__email", "student__username")
+
+
+class CommunityApprovalInline(admin.TabularInline):
+    model = CommunityApproval
+    extra = 0
+
+
+class CommunityCommentInline(admin.TabularInline):
+    model = CommunityComment
+    extra = 0
+
+
+@admin.register(CommunityPost)
+class CommunityPostAdmin(admin.ModelAdmin):
+    list_display = ("title", "author", "audience", "status", "created_at")
+    list_filter = ("audience", "status")
+    search_fields = ("title", "body", "author__email", "author__username")
+    inlines = (CommunityApprovalInline, CommunityCommentInline)

@@ -15,6 +15,7 @@ class UserProfile(models.Model):
     display_name = models.CharField(max_length=255, blank=True)
     avatar_url = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True)
+    preferences = models.JSONField(default=dict, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user_id}:{self.role}"
@@ -294,3 +295,69 @@ class PersonalCalendarNote(models.Model):
 
     def __str__(self) -> str:
         return f"{self.student_id}:{self.title}"
+
+
+class CommunityPost(models.Model):
+    class Audience(models.TextChoices):
+        ALUNOS = "alunos", "Alunos"
+        PROFESSORES = "professores", "Professores"
+
+    class Status(models.TextChoices):
+        PENDING_REVIEW = "pending_review", "Pending Review"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        PUBLISHED = "published", "Published"
+
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="community_posts"
+    )
+    audience = models.CharField(max_length=20, choices=Audience.choices)
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    status = models.CharField(max_length=20, choices=Status.choices)
+    image_url = models.URLField(blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)
+    gif_url = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class CommunityApproval(models.Model):
+    post = models.ForeignKey(
+        CommunityPost, on_delete=models.CASCADE, related_name="approvals"
+    )
+    approved_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="community_approvals"
+    )
+    status = models.CharField(max_length=20)
+    comment = models.TextField(blank=True)
+    approved_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-approved_at"]
+
+    def __str__(self) -> str:
+        return f"{self.post_id}:{self.status}"
+
+
+class CommunityComment(models.Model):
+    post = models.ForeignKey(
+        CommunityPost, on_delete=models.CASCADE, related_name="comments"
+    )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="community_comments"
+    )
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.post_id}:{self.author_id}"

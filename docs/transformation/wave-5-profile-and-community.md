@@ -114,3 +114,13 @@ flowchart LR
 - tratar comunidade como feed generico sem regra de papel
 - deixar moderacao pouco clara
 - misturar perfil e comunidade em uma unica entrega sem separacao de escopo
+
+## Implementacao (wave executada)
+
+- **5.1** Perfil base consolidado em `UserProfile` com `display_name`, `avatar_url`, `bio` e `preferences`
+- **5.2** Endpoints `GET/PATCH /api/profile/` e `POST /api/profile/avatar/` com telas web em `apps/web/src/app/aluno/perfil/page.tsx` e `apps/web/src/app/professor/perfil/page.tsx`
+- **5.3** Comunidade do aluno com posts pendentes de moderacao em `CommunityPost`
+- **5.4** Comunidade do professor como feed privado sem moderacao em `apps/web/src/app/professor/comunidade/page.tsx`
+- **5.5** Moderacao por professor em `POST /api/community/posts/{id}/approve/` e `POST /api/community/posts/{id}/reject/`
+- **5.6** Segmentacao entregue com feed aprovado do aluno, fila de moderacao do professor e feed privado de professores
+- Spec consolidada: `docs/transformation/wave-5-profile-community-spec.md`

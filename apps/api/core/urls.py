@@ -4,7 +4,9 @@ from core import (
     activities_views,
     auth_views,
     calendar_views,
+    community_views,
     content_views,
+    profile_views,
     submissions_views,
 )
 from core.views import api_info, healthcheck
@@ -15,6 +17,24 @@ urlpatterns = [
     path("auth/login/", auth_views.auth_login, name="auth-login"),
     path("auth/me/", auth_views.auth_me, name="auth-me"),
     path("auth/logout/", auth_views.auth_logout, name="auth-logout"),
+    path("profile/", profile_views.profile_item, name="profile-item"),
+    path("profile/avatar/", profile_views.profile_avatar, name="profile-avatar"),
+    path("community/posts/", community_views.community_posts_collection, name="community-posts"),
+    path(
+        "community/posts/<int:post_id>/",
+        community_views.community_post_item,
+        name="community-post-item",
+    ),
+    path(
+        "community/posts/<int:post_id>/approve/",
+        community_views.community_post_approve,
+        name="community-post-approve",
+    ),
+    path(
+        "community/posts/<int:post_id>/reject/",
+        community_views.community_post_reject,
+        name="community-post-reject",
+    ),
     path("contents/", content_views.contents_collection, name="contents"),
     path("contents/<int:content_id>/", content_views.content_item, name="content-item"),
     path("calendar/events/", calendar_views.calendar_events_collection, name="calendar-events"),

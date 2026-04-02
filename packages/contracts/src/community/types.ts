@@ -15,10 +15,27 @@ export interface CommunityPostSummary {
   gifUrl?: string | null;
 }
 
+export interface CommunityPostDetail extends CommunityPostSummary {
+  moderation?: CommunityModerationStatus | null;
+}
+
+export interface CreateCommunityPostRequest {
+  audience: CommunityAudience;
+  title: string;
+  body: string;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
+  gifUrl?: string | null;
+}
+
 export interface CommunityModerationStatus {
   postId: string;
   status: "pending_review" | "approved" | "rejected";
   moderatedBy?: string | null;
   moderatedAt?: string | null;
+  comment?: string | null;
+}
+
+export interface ModerateCommunityPostRequest {
   comment?: string | null;
 }
