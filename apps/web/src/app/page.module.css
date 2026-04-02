@@ -86,6 +86,32 @@
   font-size: 14px;
 }
 
+.code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.9em;
+}
+
+.mono {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 14px;
+}
+
+.card .primary {
+  margin-top: 4px;
+  text-decoration: none;
+  width: fit-content;
+}
+
 .ctas {
   display: flex;
   gap: 16px;

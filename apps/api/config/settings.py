@@ -26,11 +26,14 @@ def get_list_env(name: str, default: str = "") -> list[str]:
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me")
 DEBUG = get_bool_env("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = get_list_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,api")
+if DEBUG and "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [*ALLOWED_HOSTS, "testserver"]
 CORS_ALLOWED_ORIGINS = get_list_env(
     "DJANGO_CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8081",
 )
+CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 INSTALLED_APPS = [
@@ -113,7 +116,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
-    ]
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "core.authentication.AuthSessionAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

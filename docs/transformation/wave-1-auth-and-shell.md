@@ -132,3 +132,11 @@ Definir e aplicar:
 - decidir tarde a estrategia de sessao
 - duplicar logica de papel no frontend e backend
 - misturar navegacao publica e autenticada sem shell claro
+
+## Implementacao (wave executada)
+
+- **1.1** Spec: `docs/transformation/wave-1-auth-spec.md`; contratos `LoginRequest`, `AuthSessionResponse`, `MeResponse` em `packages/contracts/src/auth/session.ts`.
+- **1.2** Web: `/login`, shells `/aluno/*` e `/professor/*`, `src/middleware.ts`, `RoleGuard`, `AppShell` com navegacao por modulo (professor sem item Jogos).
+- **1.3** Mobile: stack login + drawer autenticado (`MainDrawer`), AsyncStorage + `AuthContext`, rotas por papel.
+- **1.4** API: `core.auth_views` + `UserProfile`, DRF Token, `seed_demo_users`.
+- **1.5** Documentado e aplicado em web/mobile: `docs/transformation/wave-1-guards.md`.

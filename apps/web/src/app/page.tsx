@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -8,35 +9,33 @@ export default function Home() {
       <main className={styles.main}>
         <section className={styles.hero}>
           <span className={styles.badge}>Next.js + Django + React Native</span>
-          <h1>Base web pronta para iniciar o projeto REMA.</h1>
+          <h1>REMA — base web com autenticacao (wave 1).</h1>
           <p>
-            Esta aplicacao serve como ponto de partida da versao web e ja esta
-            preparada para conversar com a API configurada no ambiente local.
+            Entre com uma conta demo para aceder ao shell de aluno ou de professor. A API
+            deve estar a correr e os utilizadores criados com{" "}
+            <code className={styles.code}>seed_demo_users</code>.
           </p>
         </section>
 
         <section className={styles.grid}>
           <article className={styles.card}>
-            <h2>API configurada</h2>
-            <p>URL base esperada para integracao entre frontend e backend.</p>
-            <code>{apiUrl}</code>
+            <h2>API</h2>
+            <p>URL base para integracao.</p>
+            <code className={styles.mono}>{apiUrl}</code>
           </article>
 
           <article className={styles.card}>
-            <h2>Proximo passo</h2>
-            <p>
-              Definir o dominio do produto, os fluxos principais e os primeiros
-              contratos de negocio.
-            </p>
+            <h2>Aceder</h2>
+            <p>Login com email e senha; redirecionamento automatico por papel.</p>
+            <Link className={styles.primary} href="/login">
+              Entrar
+            </Link>
           </article>
         </section>
 
         <div className={styles.ctas}>
-          <a className={styles.primary} href={`${apiUrl}/health/`}>
-            Ver healthcheck da API
-          </a>
-          <a className={styles.secondary} href="https://nextjs.org/docs">
-            Documentacao Next.js
+          <a className={styles.secondary} href={`${apiUrl}/health/`}>
+            Healthcheck
           </a>
         </div>
       </main>

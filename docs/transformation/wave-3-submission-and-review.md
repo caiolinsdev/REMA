@@ -133,3 +133,14 @@ flowchart LR
   inconsistente
 - confirmar envio de forma fraca e aumentar erro de utilizador
 - tela de consulta de nota nao refletir bem o historico do envio
+
+## Implementacao (wave executada)
+
+- **3.1** Respostas por questao e navegacao no web do aluno em `apps/web/src/app/aluno/atividades/[id]/page.tsx`
+- **3.2** Upload inicial de `trabalho` com um anexo e tipos permitidos protegido na API e na tela do aluno
+- **3.3** Confirmacao obrigatoria antes do envio final com alerta de imutabilidade
+- **3.4** Envio unico garantido por `Submission` unica por aluno/atividade e bloqueio apos `submitted`
+- **3.5** Correcao do professor com lista de envios e tela dedicada de revisao
+- **3.6** Comentario obrigatorio em `trabalho` protegido em `submission_review`
+- **3.7** Consulta de resultado reutilizando a tela do aluno
+- Spec consolidada: `docs/transformation/wave-3-submission-spec.md`

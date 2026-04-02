@@ -1,0 +1,182 @@
+import type {
+  ActivityDetail,
+  ActivitySummary,
+  AuthSessionResponse,
+  LoginRequest,
+  MeResponse,
+  ReviewPayload,
+  SubmissionDetail,
+  SubmissionListItem,
+  UpsertSubmissionRequest,
+  UpsertActivityRequest,
+} from "@rema/contracts";
+
+export function getApiBase(): string {
+  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+}
+
+async function parseJson(res: Response) {
+  return res.json().catch(() => ({}));
+}
+
+function getErrorMessage(data: unknown, fallback: string) {
+  if (data && typeof data === "object" && "message" in data) {
+    const message = (data as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+  return fallback;
+}
+
+async function authorizedRequest<T>(token: string, path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${getApiBase()}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Token ${token}`,
+      ...(init?.headers ?? {}),
+    },
+    cache: "no-store",
+  });
+  const data = await parseJson(res);
+  if (!res.ok) {
+    const error = new Error(getErrorMessage(data, "Falha na requisicao")) as Error & {
+      status?: number;
+    };
+    error.status = res.status;
+    throw error;
+  }
+  return data as T;
+}
+
+export async function apiLogin(body: LoginRequest): Promise<AuthSessionResponse> {
+  const res = await fetch(`${getApiBase()}/auth/login/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await parseJson(res);
+  if (!res.ok) {
+    throw new Error(getErrorMessage(data, "Falha no login"));
+  }
+  return data as AuthSessionResponse;
+}
+
+export async function apiMe(token: string): Promise<MeResponse> {
+  const res = await fetch(`${getApiBase()}/auth/me/`, {
+    headers: { Authorization: `Token ${token}` },
+    cache: "no-store",
+  });
+  if (res.status === 401) {
+    throw new Error("session_expired");
+  }
+  const data = await parseJson(res);
+  if (!res.ok) {
+    throw new Error(getErrorMessage(data, "Falha ao carregar sessao"));
+  }
+  return data as MeResponse;
+}
+
+export async function apiLogout(token: string): Promise<void> {
+  await fetch(`${getApiBase()}/auth/logout/`, {
+    method: "POST",
+    headers: { Authorization: `Token ${token}` },
+  });
+}
+
+export function apiActivities(token: string): Promise<ActivitySummary[]> {
+  return authorizedRequest<ActivitySummary[]>(token, "/activities/");
+}
+
+export function apiActivityDetail(token: string, id: number | string): Promise<ActivityDetail> {
+  return authorizedRequest<ActivityDetail>(token, `/activities/${id}/`);
+}
+
+export function apiCreateActivity(
+  token: string,
+  body: UpsertActivityRequest,
+): Promise<ActivityDetail> {
+  return authorizedRequest<ActivityDetail>(token, "/activities/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiUpdateActivity(
+  token: string,
+  id: number | string,
+  body: UpsertActivityRequest,
+): Promise<ActivityDetail> {
+  return authorizedRequest<ActivityDetail>(token, `/activities/${id}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiPublishActivity(token: string, id: number | string): Promise<ActivityDetail> {
+  return authorizedRequest<ActivityDetail>(token, `/activities/${id}/publish/`, {
+    method: "POST",
+  });
+}
+
+export function apiCurrentSubmission(
+  token: string,
+  activityId: number | string,
+): Promise<SubmissionDetail> {
+  return authorizedRequest<SubmissionDetail>(
+    token,
+    `/activities/${activityId}/submissions/current/`,
+  );
+}
+
+export function apiSaveSubmission(
+  token: string,
+  activityId: number | string,
+  body: UpsertSubmissionRequest,
+): Promise<SubmissionDetail> {
+  return authorizedRequest<SubmissionDetail>(token, `/activities/${activityId}/submissions/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiActivitySubmissions(
+  token: string,
+  activityId: number | string,
+): Promise<SubmissionListItem[]> {
+  return authorizedRequest<SubmissionListItem[]>(
+    token,
+    `/activities/${activityId}/submissions/`,
+  );
+}
+
+export function apiSubmissionDetail(
+  token: string,
+  submissionId: number | string,
+): Promise<SubmissionDetail> {
+  return authorizedRequest<SubmissionDetail>(token, `/submissions/${submissionId}/`);
+}
+
+export function apiConfirmSubmission(
+  token: string,
+  submissionId: number | string,
+): Promise<SubmissionDetail> {
+  return authorizedRequest<SubmissionDetail>(token, `/submissions/${submissionId}/confirm/`, {
+    method: "POST",
+  });
+}
+
+export function apiReviewSubmission(
+  token: string,
+  submissionId: number | string,
+  body: ReviewPayload,
+): Promise<SubmissionDetail> {
+  return authorizedRequest<SubmissionDetail>(token, `/submissions/${submissionId}/review/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}

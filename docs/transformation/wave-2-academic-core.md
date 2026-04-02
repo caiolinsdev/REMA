@@ -145,3 +145,13 @@ flowchart LR
 - deixar `trabalho` excessivamente preso ao mesmo fluxo de questoes
 - permitir estados demais cedo
 - misturar criacao e publicacao sem validacao suficiente
+
+## Implementacao (wave executada)
+
+- **2.1** Modelos `Activity`, `Question` e `QuestionOption` em `apps/api/core/models.py`
+- **2.2** Regras de criacao/publicacao protegidas em `apps/api/core/activities_views.py`
+- **2.3** Contratos e status de atividades atualizados em `packages/contracts/src/activities/types.ts`
+- **2.4** Fluxo web do professor: lista, criacao, edicao e publicacao em `apps/web/src/app/professor/atividades/*`
+- **2.5** Fluxo web do aluno: lista e detalhe em `apps/web/src/app/aluno/atividades/*`
+- **2.6** Estado `closed` formalizado em `ActivityStatus`
+- Spec consolidada: `docs/transformation/wave-2-academic-spec.md`

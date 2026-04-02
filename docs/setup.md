@@ -48,13 +48,21 @@ npm run dev:mobile
 ```
 
 O Expo exibira as opcoes para abrir no simulador ou no app Expo Go.
+Se necessario, ajuste `EXPO_PUBLIC_API_URL` em `apps/mobile/.env.example`:
+
+- iOS Simulator / Expo web: `http://localhost:8000/api`
+- Android emulator: `http://10.0.2.2:8000/api`
+- dispositivo fisico: use o IP local da maquina, por exemplo `http://192.168.0.10:8000/api`
 
 ## Rodando a API sem Docker
 
 ```bash
 ./apps/api/.venv/bin/python ./apps/api/manage.py migrate
+./apps/api/.venv/bin/python ./apps/api/manage.py seed_demo_users
 npm run dev:api
 ```
+
+O comando `seed_demo_users` cria contas demo para testar login na web e no mobile (`aluno@demo.local` / `professor@demo.local`, senha `demo123`).
 
 ## Observacoes
 
