@@ -1,6 +1,12 @@
 from django.urls import path
 
-from core import activities_views, auth_views, submissions_views
+from core import (
+    activities_views,
+    auth_views,
+    calendar_views,
+    content_views,
+    submissions_views,
+)
 from core.views import api_info, healthcheck
 
 urlpatterns = [
@@ -9,6 +15,20 @@ urlpatterns = [
     path("auth/login/", auth_views.auth_login, name="auth-login"),
     path("auth/me/", auth_views.auth_me, name="auth-me"),
     path("auth/logout/", auth_views.auth_logout, name="auth-logout"),
+    path("contents/", content_views.contents_collection, name="contents"),
+    path("contents/<int:content_id>/", content_views.content_item, name="content-item"),
+    path("calendar/events/", calendar_views.calendar_events_collection, name="calendar-events"),
+    path(
+        "calendar/events/<int:event_id>/",
+        calendar_views.calendar_event_item,
+        name="calendar-event-item",
+    ),
+    path("calendar/notes/", calendar_views.calendar_notes_collection, name="calendar-notes"),
+    path(
+        "calendar/notes/<int:note_id>/",
+        calendar_views.calendar_note_item,
+        name="calendar-note-item",
+    ),
     path("activities/", activities_views.activities_collection, name="activities"),
     path("activities/<int:activity_id>/", activities_views.activity_item, name="activity-item"),
     path(

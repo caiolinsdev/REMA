@@ -2,11 +2,18 @@ import type {
   ActivityDetail,
   ActivitySummary,
   AuthSessionResponse,
+  CalendarEventSummary,
+  ContentDetail,
+  ContentSummary,
   LoginRequest,
   MeResponse,
+  PersonalCalendarNote,
   ReviewPayload,
   SubmissionDetail,
   SubmissionListItem,
+  UpsertCalendarEventRequest,
+  UpsertContentRequest,
+  UpsertPersonalCalendarNoteRequest,
   UpsertSubmissionRequest,
   UpsertActivityRequest,
 } from "@rema/contracts";
@@ -175,6 +182,81 @@ export function apiReviewSubmission(
   body: ReviewPayload,
 ): Promise<SubmissionDetail> {
   return authorizedRequest<SubmissionDetail>(token, `/submissions/${submissionId}/review/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiContents(token: string): Promise<ContentSummary[]> {
+  return authorizedRequest<ContentSummary[]>(token, "/contents/");
+}
+
+export function apiContentDetail(
+  token: string,
+  contentId: number | string,
+): Promise<ContentDetail> {
+  return authorizedRequest<ContentDetail>(token, `/contents/${contentId}/`);
+}
+
+export function apiCreateContent(
+  token: string,
+  body: UpsertContentRequest,
+): Promise<ContentDetail> {
+  return authorizedRequest<ContentDetail>(token, "/contents/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiUpdateContent(
+  token: string,
+  contentId: number | string,
+  body: Partial<UpsertContentRequest> & { status?: string },
+): Promise<ContentDetail> {
+  return authorizedRequest<ContentDetail>(token, `/contents/${contentId}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function apiDeleteContent(
+  token: string,
+  contentId: number | string,
+): Promise<void> {
+  await authorizedRequest<Record<string, never>>(
+    token,
+    `/contents/${contentId}/`,
+    { method: "DELETE" },
+  );
+}
+
+export function apiCalendarEvents(token: string): Promise<CalendarEventSummary[]> {
+  return authorizedRequest<CalendarEventSummary[]>(token, "/calendar/events/");
+}
+
+export function apiCreateCalendarEvent(
+  token: string,
+  body: UpsertCalendarEventRequest,
+): Promise<CalendarEventSummary> {
+  return authorizedRequest<CalendarEventSummary>(token, "/calendar/events/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiCalendarNotes(token: string): Promise<PersonalCalendarNote[]> {
+  return authorizedRequest<PersonalCalendarNote[]>(token, "/calendar/notes/");
+}
+
+export function apiCreateCalendarNote(
+  token: string,
+  body: UpsertPersonalCalendarNoteRequest,
+): Promise<PersonalCalendarNote> {
+  return authorizedRequest<PersonalCalendarNote>(token, "/calendar/notes/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

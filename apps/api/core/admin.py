@@ -3,6 +3,9 @@ from django.contrib import admin
 from core.models import (
     Activity,
     AuthSession,
+    CalendarEvent,
+    Content,
+    PersonalCalendarNote,
     Question,
     QuestionOption,
     Review,
@@ -75,3 +78,23 @@ class SubmissionAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("submission", "reviewed_by", "score", "reviewed_at")
     search_fields = ("submission__activity__title", "reviewed_by__email")
+
+
+@admin.register(Content)
+class ContentAdmin(admin.ModelAdmin):
+    list_display = ("title", "status", "author", "published_at")
+    list_filter = ("status",)
+    search_fields = ("title", "subtitle", "author__email", "author__username")
+
+
+@admin.register(CalendarEvent)
+class CalendarEventAdmin(admin.ModelAdmin):
+    list_display = ("title", "type", "start_at", "end_at", "created_by", "source_activity")
+    list_filter = ("type",)
+    search_fields = ("title", "description")
+
+
+@admin.register(PersonalCalendarNote)
+class PersonalCalendarNoteAdmin(admin.ModelAdmin):
+    list_display = ("title", "student", "start_at", "end_at")
+    search_fields = ("title", "description", "student__email", "student__username")

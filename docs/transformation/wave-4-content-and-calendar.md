@@ -130,3 +130,13 @@ flowchart LR
 - superdimensionar o editor de conteúdo cedo
 - tratar calendário apenas como componente visual sem regra de domínio
 - misturar evento global com nota pessoal do aluno
+
+## Implementacao (wave executada)
+
+- **4.1** Modelo `Content` e contratos em `apps/api/core/models.py` e `packages/contracts/src/contents/types.ts`
+- **4.2** Fluxo do professor para CRUD/publicacao de conteudo em `apps/web/src/app/professor/conteudos/*`
+- **4.3** Fluxo do aluno para leitura de conteudo em `apps/web/src/app/aluno/conteudos/*`
+- **4.4** Calendario com prazos automaticos derivados de `Activity.due_at` e eventos manuais em `apps/api/core/calendar_views.py`
+- **4.5** Notas pessoais do aluno em `PersonalCalendarNote` e `apps/web/src/app/aluno/calendario/page.tsx`
+- **4.6** Estrategia inicial sem biblioteca visual dedicada; foco em lista integrada ao backend
+- Spec consolidada: `docs/transformation/wave-4-content-calendar-spec.md`

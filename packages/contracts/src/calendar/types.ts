@@ -11,6 +11,7 @@ export interface CalendarEventSummary {
   startAt: string;
   endAt: string | null;
   sourceActivityId?: string | null;
+  description?: string | null;
 }
 
 export interface PersonalCalendarNote {
@@ -20,4 +21,19 @@ export interface PersonalCalendarNote {
   description: string;
   startAt: string;
   endAt: string | null;
+}
+
+export interface UpsertCalendarEventRequest {
+  title: string;
+  description: string;
+  type: CalendarEventType;
+  startAt: string;
+  endAt?: string | null;
+}
+
+export interface UpsertPersonalCalendarNoteRequest {
+  title: string;
+  description: string;
+  startAt: string;
+  endAt?: string | null;
 }

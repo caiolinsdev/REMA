@@ -38,12 +38,18 @@ export type {
   ReviewPayload,
 } from "./activities/types";
 
-export type { ContentSummary, ContentDetail } from "./contents/types";
+export type {
+  ContentSummary,
+  ContentDetail,
+  UpsertContentRequest,
+} from "./contents/types";
 
 export type {
   CalendarEventType,
   CalendarEventSummary,
   PersonalCalendarNote,
+  UpsertCalendarEventRequest,
+  UpsertPersonalCalendarNoteRequest,
 } from "./calendar/types";
 
 export type {

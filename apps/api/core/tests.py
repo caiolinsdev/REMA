@@ -3,8 +3,18 @@ import json
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from core.models import Activity, AuthSession, Review, Submission, UserProfile
+from core.models import (
+    Activity,
+    AuthSession,
+    CalendarEvent,
+    Content,
+    PersonalCalendarNote,
+    Review,
+    Submission,
+    UserProfile,
+)
 
 
 class ApiEndpointsTests(TestCase):
@@ -394,3 +404,137 @@ class SubmissionFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["id"], str(submission.id))
+
+
+class ContentAndCalendarFlowTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(
+            username="teacher-content",
+            email="teacher-content@example.com",
+            password="demo123456",
+        )
+        self.teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.teacher.profile.display_name = "Professor Conteudo"
+        self.teacher.profile.save()
+
+        self.student = User.objects.create_user(
+            username="student-content",
+            email="student-content@example.com",
+            password="demo123456",
+        )
+        self.student.profile.role = UserProfile.Role.ALUNO
+        self.student.profile.display_name = "Aluno Conteudo"
+        self.student.profile.save()
+
+        self.teacher_session = AuthSession.objects.create(user=self.teacher)
+        self.student_session = AuthSession.objects.create(user=self.student)
+
+    def _auth(self, session: AuthSession) -> dict[str, str]:
+        return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
+
+    def test_professor_can_create_and_publish_content(self):
+        create_response = self.client.post(
+            reverse("contents"),
+            data=json.dumps(
+                {
+                    "title": "Aula 1",
+                    "subtitle": "Introducao",
+                    "description": "Conteudo inicial",
+                    "imageUrl": "https://example.com/image.png",
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(create_response.status_code, 201)
+        content_id = create_response.json()["id"]
+
+        publish_response = self.client.patch(
+            reverse("content-item", args=[content_id]),
+            data=json.dumps({"status": "published"}),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(publish_response.status_code, 200)
+        self.assertEqual(publish_response.json()["status"], "published")
+        self.assertTrue(Content.objects.get(pk=content_id).published_at is not None)
+
+    def test_student_only_sees_published_content(self):
+        draft = Content.objects.create(
+            title="Draft",
+            subtitle="Oculto",
+            description="Nao publicado",
+            author=self.teacher,
+        )
+        published = Content.objects.create(
+            title="Publicado",
+            subtitle="Visivel",
+            description="Disponivel",
+            author=self.teacher,
+            status=Content.Status.PUBLISHED,
+            published_at=timezone.now(),
+        )
+
+        list_response = self.client.get(
+            reverse("contents"), **self._auth(self.student_session)
+        )
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.json()), 1)
+        self.assertEqual(list_response.json()[0]["id"], str(published.id))
+
+        hidden_detail = self.client.get(
+            reverse("content-item", args=[draft.id]),
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(hidden_detail.status_code, 404)
+
+    def test_calendar_events_include_activity_due_dates_and_manual_events(self):
+        Activity.objects.create(
+            title="Atividade com prazo",
+            description="Descricao",
+            kind=Activity.Kind.ATIVIDADE,
+            status=Activity.Status.PUBLISHED,
+            due_at=timezone.now(),
+            total_score=100,
+            created_by=self.teacher,
+        )
+        CalendarEvent.objects.create(
+            title="Reuniao",
+            description="Evento manual",
+            type=CalendarEvent.Type.OTHER,
+            start_at=timezone.now(),
+            created_by=self.teacher,
+        )
+
+        response = self.client.get(
+            reverse("calendar-events"), **self._auth(self.student_session)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.json()), 2)
+        event_types = {item["type"] for item in response.json()}
+        self.assertIn("delivery_atividade", event_types)
+        self.assertIn("other", event_types)
+
+    def test_student_can_create_personal_note_visible_only_to_self(self):
+        create_response = self.client.post(
+            reverse("calendar-notes"),
+            data=json.dumps(
+                {
+                    "title": "Estudar",
+                    "description": "Revisar conteudo",
+                    "startAt": timezone.now().isoformat(),
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(create_response.status_code, 201)
+        note_id = create_response.json()["id"]
+        self.assertTrue(
+            PersonalCalendarNote.objects.filter(pk=note_id, student=self.student).exists()
+        )
+
+        teacher_list = self.client.get(
+            reverse("calendar-notes"), **self._auth(self.teacher_session)
+        )
+        self.assertEqual(teacher_list.status_code, 403)

@@ -212,3 +212,85 @@ class Review(models.Model):
 
     def __str__(self) -> str:
         return f"{self.submission_id}:{self.score}"
+
+
+class Content(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        PUBLISHED = "published", "Published"
+        ARCHIVED = "archived", "Archived"
+
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.DRAFT
+    )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="contents"
+    )
+    published_at = models.DateTimeField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class CalendarEvent(models.Model):
+    class Type(models.TextChoices):
+        DELIVERY_PROVA = "delivery_prova", "Prazo Prova"
+        DELIVERY_ATIVIDADE = "delivery_atividade", "Prazo Atividade"
+        DELIVERY_TRABALHO = "delivery_trabalho", "Prazo Trabalho"
+        OTHER = "other", "Outro"
+
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    type = models.CharField(max_length=30, choices=Type.choices, default=Type.OTHER)
+    start_at = models.DateTimeField()
+    end_at = models.DateTimeField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="calendar_events",
+        blank=True,
+        null=True,
+    )
+    source_activity = models.ForeignKey(
+        Activity,
+        on_delete=models.SET_NULL,
+        related_name="calendar_events",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["start_at", "id"]
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class PersonalCalendarNote(models.Model):
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="calendar_notes"
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    start_at = models.DateTimeField()
+    end_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["start_at", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.student_id}:{self.title}"

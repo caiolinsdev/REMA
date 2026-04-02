@@ -14,3 +14,11 @@ export interface ContentDetail extends ContentSummary {
   description: string;
   videoUrl?: string | null;
 }
+
+export interface UpsertContentRequest {
+  title: string;
+  subtitle: string;
+  description: string;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
+}
