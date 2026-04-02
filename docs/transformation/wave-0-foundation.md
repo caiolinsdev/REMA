@@ -143,3 +143,10 @@ Fixar estados reutilizaveis entre modulo academico, comunidade e conteudo.
 - tentar detalhar schema demais cedo
 - acoplar `trabalho` de forma irreversivel ao modelo de `atividade`
 - misturar estados de comunidade com estados academicos sem padronizacao
+
+## Implementacao (wave executada)
+
+- **0.1** Spec de entidades: `docs/transformation/wave-0-entity-spec.md`
+- **0.2** Contratos TypeScript: `packages/contracts/src/` por contexto (`auth`, `activities`, `contents`, `calendar`, `community`, `games`, `profile`, `common`)
+- **0.3** Pastas de modulo: `apps/web/src/modules/*`, `apps/mobile/src/modules/*`, `apps/api/<dominio>/*` (placeholders)
+- **0.4** Tipo `DomainLifecycleState` em `packages/contracts/src/common/states.ts`

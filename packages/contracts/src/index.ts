@@ -1,13 +1,38 @@
-export type ApiServiceStatus = "ok";
+export type { ApiServiceStatus, HealthcheckResponse, ApiInfoResponse } from "./legacy";
 
-export interface HealthcheckResponse {
-  service: string;
-  status: ApiServiceStatus;
-  environment: string;
-}
+export type { DomainLifecycleState } from "./common/states";
 
-export interface ApiInfoResponse {
-  name: string;
-  stack: string[];
-  healthcheckUrl: string;
-}
+export type { Role, AuthUser } from "./auth/types";
+
+export type {
+  ActivityKind,
+  QuestionType,
+  QuestionOption,
+  QuestionDetail,
+  ActivitySummary,
+  ActivityDetail,
+  SubmissionStatus,
+  SubmissionSummary,
+  SubmissionAnswer,
+  SubmissionFile,
+  SubmissionDetail,
+  ReviewPayload,
+} from "./activities/types";
+
+export type { ContentSummary, ContentDetail } from "./contents/types";
+
+export type {
+  CalendarEventType,
+  CalendarEventSummary,
+  PersonalCalendarNote,
+} from "./calendar/types";
+
+export type {
+  CommunityAudience,
+  CommunityPostSummary,
+  CommunityModerationStatus,
+} from "./community/types";
+
+export type { GameSummary } from "./games/types";
+
+export type { ProfileResponse } from "./profile/types";
