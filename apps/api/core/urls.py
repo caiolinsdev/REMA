@@ -6,6 +6,7 @@ from core import (
     calendar_views,
     community_views,
     content_views,
+    games_views,
     profile_views,
     submissions_views,
 )
@@ -19,6 +20,14 @@ urlpatterns = [
     path("auth/logout/", auth_views.auth_logout, name="auth-logout"),
     path("profile/", profile_views.profile_item, name="profile-item"),
     path("profile/avatar/", profile_views.profile_avatar, name="profile-avatar"),
+    path("games/", games_views.games_collection, name="games"),
+    path("games/sessions/", games_views.student_game_sessions, name="game-sessions"),
+    path("games/<int:game_id>/", games_views.game_item, name="game-item"),
+    path(
+        "games/<int:game_id>/sessions/",
+        games_views.game_sessions_collection,
+        name="game-sessions-collection",
+    ),
     path("community/posts/", community_views.community_posts_collection, name="community-posts"),
     path(
         "community/posts/<int:post_id>/",

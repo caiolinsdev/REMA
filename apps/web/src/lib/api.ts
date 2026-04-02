@@ -8,10 +8,14 @@ import type {
   ContentDetail,
   ContentSummary,
   CreateCommunityPostRequest,
+  GameDetail,
+  GameSessionSummary,
+  GameSummary,
   LoginRequest,
   MeResponse,
   ModerateCommunityPostRequest,
   PersonalCalendarNote,
+  RegisterGameSessionRequest,
   ReviewPayload,
   ProfileResponse,
   SubmissionDetail,
@@ -354,4 +358,31 @@ export function apiRejectCommunityPost(
       body: JSON.stringify(body),
     },
   );
+}
+
+export function apiGames(token: string): Promise<GameSummary[]> {
+  return authorizedRequest<GameSummary[]>(token, "/games/");
+}
+
+export function apiGameDetail(
+  token: string,
+  gameId: number | string,
+): Promise<GameDetail> {
+  return authorizedRequest<GameDetail>(token, `/games/${gameId}/`);
+}
+
+export function apiRegisterGameSession(
+  token: string,
+  gameId: number | string,
+  body: RegisterGameSessionRequest,
+): Promise<GameSessionSummary> {
+  return authorizedRequest<GameSessionSummary>(token, `/games/${gameId}/sessions/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function apiGameSessions(token: string): Promise<GameSessionSummary[]> {
+  return authorizedRequest<GameSessionSummary[]>(token, "/games/sessions/");
 }

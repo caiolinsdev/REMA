@@ -11,6 +11,8 @@ from core.models import (
     CalendarEvent,
     CommunityPost,
     Content,
+    Game,
+    GameSession,
     PersonalCalendarNote,
     Review,
     Submission,
@@ -683,3 +685,83 @@ class ProfileAndCommunityFlowTests(TestCase):
 
         self.assertEqual(reject_response.status_code, 200)
         self.assertEqual(reject_response.json()["status"], "rejected")
+
+
+class GamesFlowTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(
+            username="teacher-games",
+            email="teacher-games@example.com",
+            password="demo123456",
+        )
+        self.teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.teacher.profile.display_name = "Professor Games"
+        self.teacher.profile.save()
+
+        self.student = User.objects.create_user(
+            username="student-games",
+            email="student-games@example.com",
+            password="demo123456",
+        )
+        self.student.profile.role = UserProfile.Role.ALUNO
+        self.student.profile.display_name = "Aluno Games"
+        self.student.profile.save()
+
+        self.teacher_session = AuthSession.objects.create(user=self.teacher)
+        self.student_session = AuthSession.objects.create(user=self.student)
+
+        self.game = Game.objects.get(slug="quiz-fracoes")
+
+    def _auth(self, session: AuthSession) -> dict[str, str]:
+        return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
+
+    def test_student_lists_published_games(self):
+        response = self.client.get(reverse("games"), **self._auth(self.student_session))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(any(item["title"] == "Quiz de Fracoes" for item in response.json()))
+
+    def test_teacher_cannot_access_games_catalog(self):
+        response = self.client.get(reverse("games"), **self._auth(self.teacher_session))
+        self.assertEqual(response.status_code, 403)
+
+    def test_student_can_register_game_session(self):
+        response = self.client.post(
+            reverse("game-sessions-collection", args=[self.game.id]),
+            data=json.dumps({"score": 88, "progress": 60}),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(
+            GameSession.objects.filter(game=self.game, student=self.student, score=88).exists()
+        )
+
+        list_response = self.client.get(
+            reverse("game-sessions"), **self._auth(self.student_session)
+        )
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(len(list_response.json()), 1)
+        self.assertEqual(list_response.json()[0]["gameTitle"], "Quiz de Fracoes")
+
+    def test_game_detail_includes_student_progress(self):
+        GameSession.objects.create(
+            game=self.game,
+            student=self.student,
+            score=70,
+            progress=40,
+        )
+        GameSession.objects.create(
+            game=self.game,
+            student=self.student,
+            score=92,
+            progress=100,
+        )
+
+        response = self.client.get(
+            reverse("game-item", args=[self.game.id]),
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["bestScore"], 92)
+        self.assertEqual(response.json()["lastProgress"], 100)
+        self.assertEqual(response.json()["totalSessions"], 2)

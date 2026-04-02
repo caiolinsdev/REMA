@@ -361,3 +361,51 @@ class CommunityComment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.post_id}:{self.author_id}"
+
+
+class Game(models.Model):
+    class ExperienceType(models.TextChoices):
+        QUIZ = "quiz", "Quiz"
+        MEMORIA = "memoria", "Memoria"
+        SEQUENCIA = "sequencia", "Sequencia"
+        PALAVRAS = "palavras", "Palavras"
+        LOGICA = "logica", "Logica"
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        PUBLISHED = "published", "Published"
+        ARCHIVED = "archived", "Archived"
+
+    slug = models.SlugField(max_length=80, unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    instructions = models.TextField()
+    experience_type = models.CharField(max_length=20, choices=ExperienceType.choices)
+    estimated_minutes = models.PositiveIntegerField(default=5)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.DRAFT
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["title", "id"]
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class GameSession(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="sessions")
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="game_sessions"
+    )
+    score = models.PositiveIntegerField(default=0)
+    progress = models.PositiveIntegerField(default=0)
+    played_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-played_at", "-id"]
+
+    def __str__(self) -> str:
+        return f"{self.game_id}:{self.student_id}:{self.score}"

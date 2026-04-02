@@ -104,3 +104,13 @@ flowchart LR
 - aumentar demais o escopo do produto cedo
 - depender de fornecedor externo sem validação
 - tentar conectar desempenho do jogo à avaliação formal cedo demais
+
+## Implementacao (wave executada)
+
+- **6.1** Estrategia inicial definida como jogos independentes, sem acoplamento direto com atividades e conteudos
+- **6.2** Catalogo base entregue com `5` jogos seeded no backend via migracao
+- **6.3** Registro de sessoes e progresso com `GameSession` e endpoints dedicados
+- **6.4** Relacao com o nucleo mantida desacoplada nesta fase, preservando evolucao pedagogica futura
+- API entregue em `apps/api/core/games_views.py` e contratos compartilhados em `packages/contracts/src/games/types.ts`
+- Web do aluno entregue em `apps/web/src/app/aluno/jogos/page.tsx`
+- Spec consolidada: `docs/transformation/wave-6-games-spec.md`

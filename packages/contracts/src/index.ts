@@ -61,7 +61,13 @@ export type {
   ModerateCommunityPostRequest,
 } from "./community/types";
 
-export type { GameSummary } from "./games/types";
+export type {
+  GameExperienceType,
+  GameSummary,
+  GameDetail,
+  GameSessionSummary,
+  RegisterGameSessionRequest,
+} from "./games/types";
 
 export type {
   ProfileResponse,

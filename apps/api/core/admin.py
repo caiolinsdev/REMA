@@ -8,6 +8,8 @@ from core.models import (
     CommunityComment,
     CommunityPost,
     Content,
+    Game,
+    GameSession,
     PersonalCalendarNote,
     Question,
     QuestionOption,
@@ -119,3 +121,17 @@ class CommunityPostAdmin(admin.ModelAdmin):
     list_filter = ("audience", "status")
     search_fields = ("title", "body", "author__email", "author__username")
     inlines = (CommunityApprovalInline, CommunityCommentInline)
+
+
+@admin.register(Game)
+class GameAdmin(admin.ModelAdmin):
+    list_display = ("title", "slug", "experience_type", "estimated_minutes", "status")
+    list_filter = ("experience_type", "status")
+    search_fields = ("title", "slug", "description")
+
+
+@admin.register(GameSession)
+class GameSessionAdmin(admin.ModelAdmin):
+    list_display = ("game", "student", "score", "progress", "played_at")
+    list_filter = ("game",)
+    search_fields = ("game__title", "student__email", "student__username")
