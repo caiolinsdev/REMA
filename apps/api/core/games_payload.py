@@ -4,6 +4,7 @@ from typing import Any
 
 from django.db.models import Max
 
+from core.games_catalog import GAME_CONFIG_BY_SLUG
 from core.models import Game, GameSession
 
 
@@ -23,11 +24,17 @@ def _student_stats(game: Game, student_id: int | None) -> dict[str, Any]:
 
 def game_summary_payload(game: Game, *, student_id: int | None = None) -> dict[str, Any]:
     stats = _student_stats(game, student_id)
+    config = GAME_CONFIG_BY_SLUG.get(
+        game.slug,
+        {"game_key": "quiz_math", "source_strategy": "local_engine"},
+    )
     return {
         "id": str(game.id),
         "slug": game.slug,
         "title": game.title,
         "description": game.description,
+        "gameKey": config["game_key"],
+        "sourceStrategy": config["source_strategy"],
         "experienceType": game.experience_type,
         "estimatedMinutes": game.estimated_minutes,
         "status": game.status,

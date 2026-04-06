@@ -11,6 +11,7 @@ from core.games_payload import (
     game_session_payload,
     game_summary_payload,
 )
+from core.games_runtime import build_game_runtime
 from core.models import Game, GameSession, UserProfile
 
 
@@ -54,6 +55,20 @@ def game_item(request, game_id: int):
 
     game = get_object_or_404(Game, pk=game_id, status=Game.Status.PUBLISHED)
     return Response(game_detail_payload(game, student_id=request.user.id))
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def game_runtime(request, game_id: int):
+    student_only_error = _student_only(request)
+    if student_only_error is not None:
+        return student_only_error
+
+    game = get_object_or_404(Game, pk=game_id, status=Game.Status.PUBLISHED)
+    try:
+        return Response(build_game_runtime(game))
+    except ValueError as exc:
+        return _error(str(exc), code="unsupported_game")
 
 
 @api_view(["POST"])

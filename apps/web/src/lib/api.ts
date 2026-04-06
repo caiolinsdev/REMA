@@ -9,6 +9,7 @@ import type {
   ContentSummary,
   CreateCommunityPostRequest,
   GameDetail,
+  GameRuntimeResponse,
   GameSessionSummary,
   GameSummary,
   LoginRequest,
@@ -410,6 +411,13 @@ export function apiGameDetail(
   gameId: number | string,
 ): Promise<GameDetail> {
   return authorizedRequest<GameDetail>(token, `/games/${gameId}/`);
+}
+
+export function apiGameRuntime(
+  token: string,
+  gameId: number | string,
+): Promise<GameRuntimeResponse> {
+  return authorizedRequest<GameRuntimeResponse>(token, `/games/${gameId}/runtime/`);
 }
 
 export function apiRegisterGameSession(

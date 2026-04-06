@@ -63,10 +63,20 @@ export type {
 
 export type {
   GameExperienceType,
+  GameSourceStrategy,
+  GameKey,
   GameSummary,
   GameDetail,
   GameSessionSummary,
   RegisterGameSessionRequest,
+  GameQuizOption,
+  GameQuizQuestion,
+  HangmanRuntimePayload,
+  SudokuRuntimePayload,
+  QuizRuntimePayload,
+  MazeCell,
+  MazeRuntimePayload,
+  GameRuntimeResponse,
 } from "./games/types";
 
 export type {

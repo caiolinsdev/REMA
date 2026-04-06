@@ -1,6 +1,7 @@
 import json
 import shutil
 import tempfile
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -727,7 +728,7 @@ class GamesFlowTests(TestCase):
         self.teacher_session = AuthSession.objects.create(user=self.teacher)
         self.student_session = AuthSession.objects.create(user=self.student)
 
-        self.game = Game.objects.get(slug="quiz-fracoes")
+        self.game = Game.objects.get(slug="quiz-matematica")
 
     def _auth(self, session: AuthSession) -> dict[str, str]:
         return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
@@ -735,7 +736,10 @@ class GamesFlowTests(TestCase):
     def test_student_lists_published_games(self):
         response = self.client.get(reverse("games"), **self._auth(self.student_session))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(any(item["title"] == "Quiz de Fracoes" for item in response.json()))
+        payload = response.json()
+        self.assertEqual(len(payload), 5)
+        self.assertTrue(any(item["slug"] == "forca" for item in payload))
+        self.assertTrue(any(item["slug"] == "labirinto" for item in payload))
 
     def test_teacher_cannot_access_games_catalog(self):
         response = self.client.get(reverse("games"), **self._auth(self.teacher_session))
@@ -758,7 +762,7 @@ class GamesFlowTests(TestCase):
         )
         self.assertEqual(list_response.status_code, 200)
         self.assertEqual(len(list_response.json()), 1)
-        self.assertEqual(list_response.json()[0]["gameTitle"], "Quiz de Fracoes")
+        self.assertEqual(list_response.json()[0]["gameTitle"], "Quiz de Matematica")
 
     def test_game_detail_includes_student_progress(self):
         GameSession.objects.create(
@@ -782,6 +786,37 @@ class GamesFlowTests(TestCase):
         self.assertEqual(response.json()["bestScore"], 92)
         self.assertEqual(response.json()["lastProgress"], 100)
         self.assertEqual(response.json()["totalSessions"], 2)
+
+    @patch("core.games_runtime._fetch_json")
+    def test_student_can_fetch_hangman_runtime(self, fetch_json_mock):
+        hangman_game = Game.objects.get(slug="forca")
+        fetch_json_mock.return_value = ["caderno"]
+
+        response = self.client.get(
+            reverse("game-runtime", args=[hangman_game.id]),
+            **self._auth(self.student_session),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["kind"], "hangman")
+        self.assertEqual(payload["contentSource"], "remote_api")
+        self.assertEqual(payload["payload"]["solutionWord"], "caderno")
+
+    @patch("core.games_runtime._fetch_json")
+    def test_math_quiz_runtime_falls_back_to_local_questions(self, fetch_json_mock):
+        fetch_json_mock.side_effect = RuntimeError("provider offline")
+
+        response = self.client.get(
+            reverse("game-runtime", args=[self.game.id]),
+            **self._auth(self.student_session),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["kind"], "quiz_math")
+        self.assertEqual(payload["contentSource"], "local_fallback")
+        self.assertGreaterEqual(len(payload["payload"]["questions"]), 4)
 
 
 class LocalMediaFlowTests(TestCase):

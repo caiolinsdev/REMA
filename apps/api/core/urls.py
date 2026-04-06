@@ -25,6 +25,7 @@ urlpatterns = [
     path("games/", games_views.games_collection, name="games"),
     path("games/sessions/", games_views.student_game_sessions, name="game-sessions"),
     path("games/<int:game_id>/", games_views.game_item, name="game-item"),
+    path("games/<int:game_id>/runtime/", games_views.game_runtime, name="game-runtime"),
     path(
         "games/<int:game_id>/sessions/",
         games_views.game_sessions_collection,
