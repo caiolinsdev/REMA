@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import type { ContentDetail, UpsertContentRequest } from "@rema/contracts";
-import { apiContentDetail, apiCreateContent, apiUpdateContent } from "@/lib/api";
+import {
+  apiContentDetail,
+  apiCreateContent,
+  apiUpdateContent,
+  apiUploadMedia,
+} from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 type Props = {
@@ -30,12 +36,14 @@ export function ContentEditor({ mode, contentId }: Props) {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   useEffect(() => {
     if (mode !== "edit" || !contentId) return;
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     apiContentDetail(token, contentId)
@@ -54,7 +62,7 @@ export function ContentEditor({ mode, contentId }: Props) {
     event.preventDefault();
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     const body: UpsertContentRequest = {
@@ -76,6 +84,41 @@ export function ContentEditor({ mode, contentId }: Props) {
       setError(err instanceof Error ? err.message : "Falha ao salvar conteudo");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleUpload(
+    event: React.ChangeEvent<HTMLInputElement>,
+    kind: "content_image" | "content_video",
+  ) {
+    const file = event.target.files?.[0];
+    const token = getStoredToken();
+    if (!file || !token) return;
+    if (kind === "content_image") {
+      setUploadingImage(true);
+    }
+    if (kind === "content_video") {
+      setUploadingVideo(true);
+    }
+    setError(null);
+    try {
+      const uploaded = await apiUploadMedia(token, file, kind);
+      if (kind === "content_image") {
+        setImageUrl(uploaded.url);
+      }
+      if (kind === "content_video") {
+        setVideoUrl(uploaded.url);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao enviar arquivo");
+    } finally {
+      if (kind === "content_image") {
+        setUploadingImage(false);
+      }
+      if (kind === "content_video") {
+        setUploadingVideo(false);
+      }
+      event.target.value = "";
     }
   }
 
@@ -109,14 +152,30 @@ export function ContentEditor({ mode, contentId }: Props) {
           <span>Descricao</span>
           <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={6} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
         </label>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>Imagem (URL opcional)</span>
-          <input value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
-        </label>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>Video (URL opcional)</span>
-          <input value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
-        </label>
+        <div style={{ display: "grid", gap: 8 }}>
+          <span>Imagem do conteudo</span>
+          {imageUrl ? (
+            <MediaImage
+              src={imageUrl}
+              alt="Preview da imagem do conteudo"
+              style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #cbd5e1" }}
+            />
+          ) : null}
+          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void handleUpload(event, "content_image")} />
+          <button type="button" onClick={() => setImageUrl("")} disabled={!imageUrl || uploadingImage} style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}>
+            {uploadingImage ? "Enviando imagem…" : "Remover imagem"}
+          </button>
+        </div>
+        <div style={{ display: "grid", gap: 8 }}>
+          <span>Video do conteudo</span>
+          {videoUrl ? (
+            <video src={videoUrl} controls style={{ width: "100%", maxWidth: 420, borderRadius: 12, border: "1px solid #cbd5e1" }} />
+          ) : null}
+          <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={(event) => void handleUpload(event, "content_video")} />
+          <button type="button" onClick={() => setVideoUrl("")} disabled={!videoUrl || uploadingVideo} style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}>
+            {uploadingVideo ? "Enviando video…" : "Remover video"}
+          </button>
+        </div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <button type="submit" disabled={saving} style={{ borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}>
             {saving ? "Salvando…" : mode === "create" ? "Criar draft" : "Salvar alteracoes"}

@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.media_utils import validate_controlled_media_url
 from core.content_payload import content_detail_payload, content_summary_payload
 from core.models import Content, UserProfile
 
@@ -40,8 +41,17 @@ def contents_collection(request):
     title = str(request.data.get("title") or "").strip()
     subtitle = str(request.data.get("subtitle") or "").strip()
     description = str(request.data.get("description") or "").strip()
-    image_url = request.data.get("imageUrl") or request.data.get("image_url")
-    video_url = request.data.get("videoUrl") or request.data.get("video_url")
+    try:
+        image_url = validate_controlled_media_url(
+            request.data.get("imageUrl") or request.data.get("image_url"),
+            allowed_kinds={"content_image"},
+        )
+        video_url = validate_controlled_media_url(
+            request.data.get("videoUrl") or request.data.get("video_url"),
+            allowed_kinds={"content_video"},
+        )
+    except ValueError as exc:
+        return _error(str(exc))
 
     if not title or not subtitle or not description:
         return _error("Titulo, subtitulo e descricao sao obrigatorios.")
@@ -84,8 +94,17 @@ def content_item(request, content_id: int):
     title = str(request.data.get("title", content.title) or "").strip()
     subtitle = str(request.data.get("subtitle", content.subtitle) or "").strip()
     description = str(request.data.get("description", content.description) or "").strip()
-    image_url = request.data.get("imageUrl", request.data.get("image_url", content.image_url))
-    video_url = request.data.get("videoUrl", request.data.get("video_url", content.video_url))
+    try:
+        image_url = validate_controlled_media_url(
+            request.data.get("imageUrl", request.data.get("image_url", content.image_url)),
+            allowed_kinds={"content_image"},
+        )
+        video_url = validate_controlled_media_url(
+            request.data.get("videoUrl", request.data.get("video_url", content.video_url)),
+            allowed_kinds={"content_video"},
+        )
+    except ValueError as exc:
+        return _error(str(exc))
     requested_status = request.data.get("status", content.status)
 
     if not title or not subtitle or not description:

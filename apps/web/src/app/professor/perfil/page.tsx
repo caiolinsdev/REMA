@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { apiProfile, apiUpdateAvatar, apiUpdateProfile } from "@/lib/api";
+import { apiProfile, apiUpdateAvatar, apiUpdateProfile, apiUploadMedia } from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 export default function Page() {
@@ -11,6 +12,7 @@ export default function Page() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [communityEmails, setCommunityEmails] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -51,6 +53,24 @@ export default function Page() {
     }
   }
 
+  async function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    const token = getStoredToken();
+    if (!file || !token) return;
+    setUploadingAvatar(true);
+    setError(null);
+    try {
+      const uploaded = await apiUploadMedia(token, file, "avatar");
+      setAvatarUrl(uploaded.url);
+      await apiUpdateAvatar(token, { avatarUrl: uploaded.url });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao enviar avatar");
+    } finally {
+      setUploadingAvatar(false);
+      event.target.value = "";
+    }
+  }
+
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
@@ -78,12 +98,19 @@ export default function Page() {
         </button>
       </section>
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 14 }}>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>URL do avatar</span>
-          <input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
-        </label>
-        <button type="button" onClick={() => void saveAvatar()} style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "12px 16px", background: "#fff", cursor: "pointer" }}>
-          Atualizar avatar
+        <span>Avatar</span>
+        {avatarUrl ? (
+          <MediaImage
+            src={avatarUrl}
+            alt="Avatar do professor"
+            style={{ width: 96, height: 96, borderRadius: "50%", objectFit: "cover", border: "1px solid #cbd5e1" }}
+          />
+        ) : (
+          <div style={{ width: 96, height: 96, borderRadius: "50%", background: "#e2e8f0" }} />
+        )}
+        <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void handleAvatarChange(event)} />
+        <button type="button" onClick={() => void saveAvatar()} disabled={!avatarUrl || uploadingAvatar} style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "12px 16px", background: "#fff", cursor: "pointer" }}>
+          {uploadingAvatar ? "Enviando…" : "Salvar avatar atual"}
         </button>
       </section>
     </div>

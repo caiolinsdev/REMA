@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import type { ContentDetail } from "@rema/contracts";
 import { apiContentDetail } from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 export default function Page() {
@@ -37,14 +38,18 @@ export default function Page() {
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 16 }}>
         <p style={{ margin: 0, color: "#334155", lineHeight: 1.7 }}>{content.description}</p>
         {content.imageUrl ? (
-          <p style={{ margin: 0 }}>
-            Imagem: <a href={content.imageUrl} target="_blank" rel="noreferrer">abrir</a>
-          </p>
+          <MediaImage
+            src={content.imageUrl}
+            alt={content.title}
+            style={{ width: "100%", maxWidth: 640, borderRadius: 12, border: "1px solid #dbe4f0" }}
+          />
         ) : null}
         {content.videoUrl ? (
-          <p style={{ margin: 0 }}>
-            Video: <a href={content.videoUrl} target="_blank" rel="noreferrer">abrir</a>
-          </p>
+          <video
+            src={content.videoUrl}
+            controls
+            style={{ width: "100%", maxWidth: 720, borderRadius: 12, border: "1px solid #dbe4f0" }}
+          />
         ) : null}
       </section>
     </div>

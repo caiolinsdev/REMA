@@ -1,7 +1,10 @@
 import json
+import shutil
+import tempfile
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -436,6 +439,20 @@ class ContentAndCalendarFlowTests(TestCase):
         return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
 
     def test_professor_can_create_and_publish_content(self):
+        upload_response = self.client.post(
+            reverse("media-upload"),
+            data={
+                "kind": "content_image",
+                "file": SimpleUploadedFile(
+                    "conteudo.png",
+                    b"content-image",
+                    content_type="image/png",
+                ),
+            },
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(upload_response.status_code, 201)
+
         create_response = self.client.post(
             reverse("contents"),
             data=json.dumps(
@@ -443,7 +460,7 @@ class ContentAndCalendarFlowTests(TestCase):
                     "title": "Aula 1",
                     "subtitle": "Introducao",
                     "description": "Conteudo inicial",
-                    "imageUrl": "https://example.com/image.png",
+                    "imageUrl": upload_response.json()["url"],
                 }
             ),
             content_type="application/json",
@@ -765,3 +782,169 @@ class GamesFlowTests(TestCase):
         self.assertEqual(response.json()["bestScore"], 92)
         self.assertEqual(response.json()["lastProgress"], 100)
         self.assertEqual(response.json()["totalSessions"], 2)
+
+
+class LocalMediaFlowTests(TestCase):
+    def setUp(self):
+        self.temp_media_root = tempfile.mkdtemp()
+        self.override = override_settings(MEDIA_ROOT=self.temp_media_root)
+        self.override.enable()
+
+        self.teacher = User.objects.create_user(
+            username="teacher-media",
+            email="teacher-media@example.com",
+            password="demo123456",
+        )
+        self.teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.teacher.profile.display_name = "Professor Midia"
+        self.teacher.profile.save()
+
+        self.student = User.objects.create_user(
+            username="student-media",
+            email="student-media@example.com",
+            password="demo123456",
+        )
+        self.student.profile.role = UserProfile.Role.ALUNO
+        self.student.profile.display_name = "Aluno Midia"
+        self.student.profile.save()
+
+        self.teacher_session = AuthSession.objects.create(user=self.teacher)
+        self.student_session = AuthSession.objects.create(user=self.student)
+
+    def tearDown(self):
+        self.override.disable()
+        shutil.rmtree(self.temp_media_root, ignore_errors=True)
+        super().tearDown()
+
+    def _auth(self, session: AuthSession) -> dict[str, str]:
+        return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
+
+    def _upload(self, session: AuthSession, *, kind: str, name: str, content: bytes, content_type: str) -> str:
+        response = self.client.post(
+            reverse("media-upload"),
+            data={
+                "kind": kind,
+                "file": SimpleUploadedFile(name, content, content_type=content_type),
+            },
+            **self._auth(session),
+        )
+        self.assertEqual(response.status_code, 201)
+        return response.json()["url"]
+
+    def test_uploaded_media_can_be_used_across_wave_8_resources(self):
+        avatar_url = self._upload(
+            self.student_session,
+            kind="avatar",
+            name="avatar.png",
+            content=b"avatar-bytes",
+            content_type="image/png",
+        )
+        support_image_url = self._upload(
+            self.teacher_session,
+            kind="activity_support_image",
+            name="apoio.png",
+            content=b"support-image",
+            content_type="image/png",
+        )
+        content_image_url = self._upload(
+            self.teacher_session,
+            kind="content_image",
+            name="conteudo.png",
+            content=b"content-image",
+            content_type="image/png",
+        )
+        community_image_url = self._upload(
+            self.student_session,
+            kind="community_image",
+            name="post.png",
+            content=b"community-image",
+            content_type="image/png",
+        )
+
+        avatar_response = self.client.post(
+            reverse("profile-avatar"),
+            data=json.dumps({"avatarUrl": avatar_url}),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(avatar_response.status_code, 200)
+        self.assertEqual(avatar_response.json()["avatarUrl"], avatar_url)
+
+        content_response = self.client.post(
+            reverse("contents"),
+            data=json.dumps(
+                {
+                    "title": "Conteudo com midia",
+                    "subtitle": "Aula com imagem local",
+                    "description": "Descricao",
+                    "imageUrl": content_image_url,
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(content_response.status_code, 201)
+        self.assertEqual(content_response.json()["imageUrl"], content_image_url)
+
+        community_response = self.client.post(
+            reverse("community-posts"),
+            data=json.dumps(
+                {
+                    "audience": "alunos",
+                    "title": "Post com imagem",
+                    "body": "Usando midia local",
+                    "imageUrl": community_image_url,
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.student_session),
+        )
+        self.assertEqual(community_response.status_code, 201)
+        self.assertEqual(community_response.json()["imageUrl"], community_image_url)
+
+        activity_response = self.client.post(
+            reverse("activities"),
+            data=json.dumps(
+                {
+                    "title": "Atividade com apoio",
+                    "description": "Descricao",
+                    "kind": "atividade",
+                    "totalScore": 100,
+                    "questions": [
+                        {
+                            "statement": "Observe a imagem",
+                            "type": "dissertativa",
+                            "weight": 100,
+                            "position": 1,
+                            "supportImageUrl": support_image_url,
+                            "expectedAnswer": "Resposta",
+                            "options": [],
+                        }
+                    ],
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(activity_response.status_code, 201)
+        self.assertEqual(
+            activity_response.json()["questions"][0]["supportImageUrl"],
+            support_image_url,
+        )
+
+    def test_resource_rejects_arbitrary_external_media_url(self):
+        response = self.client.post(
+            reverse("contents"),
+            data=json.dumps(
+                {
+                    "title": "Conteudo invalido",
+                    "subtitle": "Sem upload",
+                    "description": "Descricao",
+                    "imageUrl": "https://example.com/image.png",
+                }
+            ),
+            content_type="application/json",
+            **self._auth(self.teacher_session),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Use um arquivo enviado pela API.")

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import type { ActivityDetail, SubmissionListItem } from "@rema/contracts";
 import { apiActivityDetail, apiActivitySubmissions, apiPublishActivity } from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 function formatDate(value: string | null) {
@@ -127,12 +128,11 @@ export default function Page({
                 {question.type} · peso {question.weight}
               </p>
               {question.supportImageUrl ? (
-                <p>
-                  Imagem de apoio:{" "}
-                  <a href={question.supportImageUrl} target="_blank" rel="noreferrer">
-                    abrir
-                  </a>
-                </p>
+                <MediaImage
+                  src={question.supportImageUrl}
+                  alt={`Imagem de apoio da questao ${question.position}`}
+                  style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }}
+                />
               ) : null}
               {question.options?.length ? (
                 <ul>

@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import type { ActivityDetail, QuestionInput, UpsertActivityRequest } from "@rema/contracts";
-import { apiActivityDetail, apiCreateActivity, apiUpdateActivity } from "@/lib/api";
+import {
+  apiActivityDetail,
+  apiCreateActivity,
+  apiUpdateActivity,
+  apiUploadMedia,
+} from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 type Props = {
@@ -124,6 +130,24 @@ export function ActivityEditor({ mode, activityId }: Props) {
 
   function removeQuestion(index: number) {
     setQuestions((current) => current.filter((_, currentIndex) => currentIndex !== index).map((question, currentIndex) => ({ ...question, position: currentIndex + 1 })));
+  }
+
+  async function uploadSupportImage(
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) {
+    const file = event.target.files?.[0];
+    const token = getStoredToken();
+    if (!file || !token) return;
+    setError(null);
+    try {
+      const uploaded = await apiUploadMedia(token, file, "activity_support_image");
+      updateQuestion(index, { supportImageUrl: uploaded.url });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao enviar imagem de apoio");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   async function onSubmit(event: React.FormEvent) {
@@ -311,14 +335,28 @@ export function ActivityEditor({ mode, activityId }: Props) {
                         style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
                       />
                     </label>
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span>Imagem de apoio (URL)</span>
+                    <div style={{ display: "grid", gap: 6 }}>
+                      <span>Imagem de apoio</span>
+                      {question.supportImageUrl ? (
+                        <MediaImage
+                          src={question.supportImageUrl}
+                          alt={`Imagem de apoio da questao ${index + 1}`}
+                          style={{ width: "100%", maxWidth: 180, borderRadius: 12, border: "1px solid #cbd5e1" }}
+                        />
+                      ) : null}
                       <input
-                        value={question.supportImageUrl ?? ""}
-                        onChange={(event) => updateQuestion(index, { supportImageUrl: event.target.value })}
-                        style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        onChange={(event) => void uploadSupportImage(event, index)}
                       />
-                    </label>
+                      <button
+                        type="button"
+                        onClick={() => updateQuestion(index, { supportImageUrl: "" })}
+                        style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
+                      >
+                        Remover imagem
+                      </button>
+                    </div>
                   </div>
 
                   <label style={{ display: "grid", gap: 6 }}>

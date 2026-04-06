@@ -1,4 +1,5 @@
 import secrets
+from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -19,6 +20,15 @@ class UserProfile(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user_id}:{self.role}"
+
+
+def upload_media_path(instance: "MediaAsset", filename: str) -> str:
+    extension = Path(filename).suffix.lower()
+    stamp = timezone.now()
+    return (
+        f"uploads/{instance.kind}/{stamp:%Y}/{stamp:%m}/"
+        f"{secrets.token_hex(16)}{extension}"
+    )
 
 
 class AuthSession(models.Model):
@@ -42,6 +52,23 @@ class AuthSession(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user_id}:{self.key[:8]}"
+
+
+class MediaAsset(models.Model):
+    file = models.FileField(upload_to=upload_media_path)
+    kind = models.CharField(max_length=50)
+    content_type = models.CharField(max_length=100)
+    size = models.PositiveIntegerField()
+    uploaded_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="media_assets"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+
+    def __str__(self) -> str:
+        return f"{self.kind}:{self.id}"
 
 
 class Activity(models.Model):

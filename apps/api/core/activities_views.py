@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.activities_payload import activity_detail_payload, activity_summary_payload, validation_summary_for
+from core.media_utils import validate_controlled_media_url
 from core.models import Activity, Question, QuestionOption, UserProfile
 
 
@@ -81,8 +82,11 @@ def _normalize_questions(raw_questions) -> list[dict[str, Any]]:
                 "type": str(question.get("type") or "").strip(),
                 "weight": weight,
                 "position": position,
-                "support_image_url": question.get("supportImageUrl")
-                or question.get("support_image_url"),
+                "support_image_url": validate_controlled_media_url(
+                    question.get("supportImageUrl")
+                    or question.get("support_image_url"),
+                    allowed_kinds={"activity_support_image"},
+                ),
                 "expected_answer": str(
                     question.get("expectedAnswer") or question.get("expected_answer") or ""
                 ).strip(),

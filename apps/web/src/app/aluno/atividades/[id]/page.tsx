@@ -10,6 +10,7 @@ import {
   apiCurrentSubmission,
   apiSaveSubmission,
 } from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 function formatDate(value: string | null) {
@@ -245,12 +246,11 @@ export default function Page() {
                 {currentQuestion.type} · peso {currentQuestion.weight}
               </p>
               {currentQuestion.supportImageUrl ? (
-                <p>
-                  Imagem de apoio:{" "}
-                  <a href={currentQuestion.supportImageUrl} target="_blank" rel="noreferrer">
-                    abrir
-                  </a>
-                </p>
+                <MediaImage
+                  src={currentQuestion.supportImageUrl}
+                  alt={`Imagem de apoio da questao ${currentQuestion.position}`}
+                  style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }}
+                />
               ) : null}
 
               {currentQuestion.type === "multipla_escolha" ? (

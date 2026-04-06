@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.media_utils import validate_controlled_media_url
 from core.profile_payload import profile_payload
 
 
@@ -43,9 +44,16 @@ def profile_item(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def profile_avatar(request):
-    avatar_url = str(
-        request.data.get("avatarUrl", request.data.get("avatar_url", "")) or ""
-    ).strip()
+    try:
+        avatar_url = validate_controlled_media_url(
+            request.data.get("avatarUrl", request.data.get("avatar_url", "")),
+            allowed_kinds={"avatar"},
+        )
+    except ValueError as exc:
+        return Response(
+            {"code": "invalid_profile", "message": str(exc)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     if not avatar_url:
         return Response(
             {"code": "invalid_profile", "message": "Avatar e obrigatorio."},

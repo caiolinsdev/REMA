@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.media_utils import validate_controlled_media_url
 from core.community_payload import (
     community_post_detail_payload,
     community_post_summary_payload,
@@ -65,9 +66,21 @@ def community_posts_collection(request):
     audience = str(request.data.get("audience") or "").strip()
     title = str(request.data.get("title") or "").strip()
     body = str(request.data.get("body") or "").strip()
-    image_url = request.data.get("imageUrl") or request.data.get("image_url")
-    video_url = request.data.get("videoUrl") or request.data.get("video_url")
-    gif_url = request.data.get("gifUrl") or request.data.get("gif_url")
+    try:
+        image_url = validate_controlled_media_url(
+            request.data.get("imageUrl") or request.data.get("image_url"),
+            allowed_kinds={"community_image"},
+        )
+        video_url = validate_controlled_media_url(
+            request.data.get("videoUrl") or request.data.get("video_url"),
+            allowed_kinds={"community_video"},
+        )
+        gif_url = validate_controlled_media_url(
+            request.data.get("gifUrl") or request.data.get("gif_url"),
+            allowed_kinds={"community_gif"},
+        )
+    except ValueError as exc:
+        return _error(str(exc))
 
     if audience not in CommunityPost.Audience.values:
         return _error("Audience invalida.")

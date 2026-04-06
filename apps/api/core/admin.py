@@ -10,6 +10,7 @@ from core.models import (
     Content,
     Game,
     GameSession,
+    MediaAsset,
     PersonalCalendarNote,
     Question,
     QuestionOption,
@@ -135,3 +136,10 @@ class GameSessionAdmin(admin.ModelAdmin):
     list_display = ("game", "student", "score", "progress", "played_at")
     list_filter = ("game",)
     search_fields = ("game__title", "student__email", "student__username")
+
+
+@admin.register(MediaAsset)
+class MediaAssetAdmin(admin.ModelAdmin):
+    list_display = ("id", "kind", "uploaded_by", "content_type", "size", "created_at")
+    list_filter = ("kind", "content_type")
+    search_fields = ("file", "uploaded_by__email", "uploaded_by__username")

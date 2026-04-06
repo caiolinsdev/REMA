@@ -33,6 +33,27 @@ export function getApiBase(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 }
 
+export function getApiOrigin(): string {
+  return new URL(getApiBase()).origin;
+}
+
+export type MediaUploadKind =
+  | "avatar"
+  | "content_image"
+  | "content_video"
+  | "community_image"
+  | "community_video"
+  | "community_gif"
+  | "activity_support_image";
+
+export type MediaUploadResponse = {
+  id: string;
+  kind: MediaUploadKind;
+  url: string;
+  contentType: string;
+  size: number;
+};
+
 async function parseJson(res: Response) {
   return res.json().catch(() => ({}));
 }
@@ -298,6 +319,26 @@ export function apiUpdateAvatar(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+export async function apiUploadMedia(
+  token: string,
+  file: File,
+  kind: MediaUploadKind,
+): Promise<MediaUploadResponse> {
+  const formData = new FormData();
+  formData.set("kind", kind);
+  formData.set("file", file);
+  const res = await fetch(`${getApiBase()}/media/upload/`, {
+    method: "POST",
+    headers: { Authorization: `Token ${token}` },
+    body: formData,
+  });
+  const data = await parseJson(res);
+  if (!res.ok) {
+    throw new Error(getErrorMessage(data, "Falha ao enviar arquivo"));
+  }
+  return data as MediaUploadResponse;
 }
 
 export function apiCommunityPosts(

@@ -8,7 +8,9 @@ import {
   apiCommunityPosts,
   apiCreateCommunityPost,
   apiRejectCommunityPost,
+  apiUploadMedia,
 } from "@/lib/api";
+import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 export default function Page() {
@@ -16,7 +18,11 @@ export default function Page() {
   const [moderationQueue, setModerationQueue] = useState<CommunityPostSummary[]>([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [gifUrl, setGifUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [uploadingKind, setUploadingKind] = useState<string | null>(null);
 
   const loadData = useCallback(() => {
     const token = getStoredToken();
@@ -45,12 +51,40 @@ export default function Page() {
         audience: "professores",
         title,
         body,
+        imageUrl: imageUrl || null,
+        videoUrl: videoUrl || null,
+        gifUrl: gifUrl || null,
       });
       setTitle("");
       setBody("");
+      setImageUrl("");
+      setVideoUrl("");
+      setGifUrl("");
       loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Falha ao publicar");
+    }
+  }
+
+  async function uploadMedia(
+    event: React.ChangeEvent<HTMLInputElement>,
+    kind: "community_image" | "community_video" | "community_gif",
+  ) {
+    const file = event.target.files?.[0];
+    const token = getStoredToken();
+    if (!file || !token) return;
+    setUploadingKind(kind);
+    setError(null);
+    try {
+      const uploaded = await apiUploadMedia(token, file, kind);
+      if (kind === "community_image") setImageUrl(uploaded.url);
+      if (kind === "community_video") setVideoUrl(uploaded.url);
+      if (kind === "community_gif") setGifUrl(uploaded.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao enviar arquivo");
+    } finally {
+      setUploadingKind(null);
+      event.target.value = "";
     }
   }
 
@@ -83,8 +117,23 @@ export default function Page() {
         <h2 style={{ margin: 0 }}>Novo post para professores</h2>
         <input placeholder="Titulo do aviso" value={title} onChange={(e) => setTitle(e.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
         <textarea placeholder="Compartilhe combinados e trocas internas" value={body} onChange={(e) => setBody(e.target.value)} rows={5} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
+        <label style={{ display: "grid", gap: 6 }}>
+          <span>Imagem opcional</span>
+          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void uploadMedia(event, "community_image")} />
+        </label>
+        <label style={{ display: "grid", gap: 6 }}>
+          <span>Video opcional</span>
+          <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={(event) => void uploadMedia(event, "community_video")} />
+        </label>
+        <label style={{ display: "grid", gap: 6 }}>
+          <span>GIF opcional</span>
+          <input type="file" accept="image/gif" onChange={(event) => void uploadMedia(event, "community_gif")} />
+        </label>
+        {imageUrl ? <MediaImage src={imageUrl} alt="Preview da imagem do post" style={{ width: 180, borderRadius: 12, border: "1px solid #cbd5e1" }} /> : null}
+        {videoUrl ? <video src={videoUrl} controls style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #cbd5e1" }} /> : null}
+        {gifUrl ? <MediaImage src={gifUrl} alt="Preview do gif do post" style={{ width: 180, borderRadius: 12, border: "1px solid #cbd5e1" }} /> : null}
         <button type="button" onClick={() => void submitTeacherPost()} style={{ width: "fit-content", borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}>
-          Publicar no feed privado
+          {uploadingKind ? "Enviando arquivo…" : "Publicar no feed privado"}
         </button>
       </section>
       <section style={{ display: "grid", gap: 12 }}>
@@ -95,6 +144,9 @@ export default function Page() {
               <strong>{post.title}</strong>
               <p style={{ marginBottom: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{post.body}</p>
             </div>
+            {post.imageUrl ? <MediaImage src={post.imageUrl} alt={post.title} style={{ width: 180, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
+            {post.videoUrl ? <video src={post.videoUrl} controls style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
+            {post.gifUrl ? <MediaImage src={post.gifUrl} alt={post.title} style={{ width: 180, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
             <div style={{ display: "flex", gap: 10 }}>
               <button type="button" onClick={() => void moderate(post.id, "approve")} style={{ borderRadius: 10, border: "none", padding: "10px 14px", background: "#166534", color: "#fff", cursor: "pointer" }}>
                 Aprovar
@@ -115,6 +167,9 @@ export default function Page() {
           <article key={post.id} style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
             <h3 style={{ marginTop: 0 }}>{post.title}</h3>
             <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{post.body}</p>
+            {post.imageUrl ? <MediaImage src={post.imageUrl} alt={post.title} style={{ width: 180, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
+            {post.videoUrl ? <video src={post.videoUrl} controls style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
+            {post.gifUrl ? <MediaImage src={post.gifUrl} alt={post.title} style={{ width: 180, borderRadius: 12, border: "1px solid #dbe4f0" }} /> : null}
           </article>
         ))}
         {teacherPosts.length === 0 ? (
