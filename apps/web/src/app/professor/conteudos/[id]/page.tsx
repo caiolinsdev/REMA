@@ -26,7 +26,7 @@ export default function Page() {
   useEffect(() => {
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     apiContentDetail(token, params.id)

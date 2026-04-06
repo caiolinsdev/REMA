@@ -80,7 +80,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
     if (mode !== "edit" || !activityId) return;
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     let cancelled = false;
@@ -130,7 +130,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
     event.preventDefault();
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
 

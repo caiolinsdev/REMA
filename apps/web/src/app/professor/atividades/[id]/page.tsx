@@ -30,7 +30,7 @@ export default function Page({
     if (!activityId) return;
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     apiActivityDetail(token, activityId)
@@ -45,7 +45,7 @@ export default function Page({
     if (!activityId) return;
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     setPublishing(true);

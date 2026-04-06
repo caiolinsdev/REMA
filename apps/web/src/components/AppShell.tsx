@@ -38,7 +38,7 @@ export function AppShell({ area, navItems, children }: Props) {
       }
     }
     clearAuthCookies();
-    router.replace("/login");
+    router.replace("/");
   }
 
   return (

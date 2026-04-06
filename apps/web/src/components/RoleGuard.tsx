@@ -21,7 +21,7 @@ export function RoleGuard({ expectedRole, wrongRoleRedirect, children }: Props) 
     const token = getStoredToken();
     if (!token) {
       clearAuthCookies();
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     let cancelled = false;
@@ -37,7 +37,7 @@ export function RoleGuard({ expectedRole, wrongRoleRedirect, children }: Props) 
       } catch {
         if (cancelled) return;
         clearAuthCookies();
-        router.replace("/login");
+        router.replace("/");
       }
     })();
     return () => {

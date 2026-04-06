@@ -43,7 +43,7 @@ export default function Page() {
   useEffect(() => {
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     apiActivityDetail(token, params.id)
@@ -138,7 +138,7 @@ export default function Page() {
   async function saveDraft() {
     const token = getStoredToken();
     if (!token || !activity) {
-      router.replace("/login");
+      router.replace("/");
       return null;
     }
     setSaving(true);
@@ -159,7 +159,7 @@ export default function Page() {
     if (!activity) return;
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     const accepted = window.confirm(

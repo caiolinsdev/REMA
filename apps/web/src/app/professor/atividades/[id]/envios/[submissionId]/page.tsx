@@ -28,7 +28,7 @@ export default function Page() {
   useEffect(() => {
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     apiSubmissionDetail(token, params.submissionId)
@@ -44,7 +44,7 @@ export default function Page() {
     event.preventDefault();
     const token = getStoredToken();
     if (!token) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
     setSaving(true);
