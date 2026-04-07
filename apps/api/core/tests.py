@@ -1,6 +1,7 @@
 import json
 import shutil
 import tempfile
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
@@ -703,6 +704,236 @@ class ProfileAndCommunityFlowTests(TestCase):
 
         self.assertEqual(reject_response.status_code, 200)
         self.assertEqual(reject_response.json()["status"], "rejected")
+
+
+class HomeSummaryFlowTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(
+            username="teacher-home",
+            email="teacher-home@example.com",
+            password="demo123456",
+        )
+        self.teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.teacher.profile.display_name = "Professor Home"
+        self.teacher.profile.save()
+
+        self.other_teacher = User.objects.create_user(
+            username="teacher-home-2",
+            email="teacher-home-2@example.com",
+            password="demo123456",
+        )
+        self.other_teacher.profile.role = UserProfile.Role.PROFESSOR
+        self.other_teacher.profile.display_name = "Outro Professor"
+        self.other_teacher.profile.save()
+
+        self.student = User.objects.create_user(
+            username="student-home",
+            email="student-home@example.com",
+            password="demo123456",
+        )
+        self.student.profile.role = UserProfile.Role.ALUNO
+        self.student.profile.display_name = "Aluno Home"
+        self.student.profile.save()
+
+        self.teacher_session = AuthSession.objects.create(user=self.teacher)
+        self.student_session = AuthSession.objects.create(user=self.student)
+
+    def _auth(self, session: AuthSession) -> dict[str, str]:
+        return {"HTTP_AUTHORIZATION": f"Token {session.key}"}
+
+    def test_student_home_summary_returns_recent_posts_and_upcoming_items(self):
+        now = timezone.now()
+        approved_posts = []
+        for index in range(4):
+            post = CommunityPost.objects.create(
+                author=self.student,
+                audience=CommunityPost.Audience.ALUNOS,
+                title=f"Post {index + 1}",
+                body=f"Conteúdo {index + 1}",
+                status=CommunityPost.Status.APPROVED,
+            )
+            CommunityPost.objects.filter(pk=post.pk).update(
+                created_at=now - timedelta(hours=(4 - index))
+            )
+            approved_posts.append(post)
+
+        CommunityPost.objects.create(
+            author=self.student,
+            audience=CommunityPost.Audience.ALUNOS,
+            title="Post pendente",
+            body="Não deve entrar",
+            status=CommunityPost.Status.PENDING_REVIEW,
+        )
+
+        CalendarEvent.objects.create(
+            title="Aula ao vivo",
+            description="Evento futuro",
+            type=CalendarEvent.Type.OTHER,
+            start_at=now + timedelta(hours=2),
+            created_by=self.teacher,
+        )
+        CalendarEvent.objects.create(
+            title="Evento antigo",
+            description="Passado",
+            type=CalendarEvent.Type.OTHER,
+            start_at=now - timedelta(days=1),
+            created_by=self.teacher,
+        )
+        Activity.objects.create(
+            title="Tarefa publicada",
+            description="Entrega importante",
+            kind=Activity.Kind.ATIVIDADE,
+            status=Activity.Status.PUBLISHED,
+            due_at=now + timedelta(days=1),
+            total_score=100,
+            created_by=self.teacher,
+        )
+        Activity.objects.create(
+            title="Rascunho oculto",
+            description="Não deve entrar",
+            kind=Activity.Kind.PROVA,
+            status=Activity.Status.DRAFT,
+            due_at=now + timedelta(minutes=30),
+            total_score=100,
+            created_by=self.teacher,
+        )
+        PersonalCalendarNote.objects.create(
+            student=self.student,
+            title="Revisar capítulo",
+            description="Nota pessoal futura",
+            start_at=now + timedelta(hours=1),
+        )
+        PersonalCalendarNote.objects.create(
+            student=self.student,
+            title="Nota antiga",
+            description="Passado",
+            start_at=now - timedelta(hours=1),
+        )
+
+        response = self.client.get(
+            reverse("student-home-summary"), **self._auth(self.student_session)
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual([item["title"] for item in payload["recentPosts"]], ["Post 4", "Post 3", "Post 2"])
+        self.assertEqual(len(payload["upcomingItems"]), 3)
+        self.assertEqual(
+            [item["title"] for item in payload["upcomingItems"]],
+            ["Revisar capítulo", "Aula ao vivo", "Prazo: Tarefa publicada"],
+        )
+        self.assertEqual(payload["upcomingItems"][0]["source"], "personal_note")
+        self.assertEqual(payload["upcomingItems"][2]["eventType"], "delivery_atividade")
+
+    def test_teacher_home_summary_returns_recent_contents_and_pending_reviews(self):
+        now = timezone.now()
+        recent_content_ids = []
+        for index in range(4):
+            content = Content.objects.create(
+                title=f"Conteúdo {index + 1}",
+                subtitle="Resumo",
+                description="Descrição",
+                author=self.teacher,
+                status=Content.Status.PUBLISHED if index != 1 else Content.Status.DRAFT,
+                published_at=None if index == 1 else now - timedelta(hours=index + 1),
+            )
+            if index == 1:
+                Content.objects.filter(pk=content.pk).update(
+                    created_at=now - timedelta(hours=2, minutes=30)
+                )
+            recent_content_ids.append(str(content.id))
+
+        Content.objects.create(
+            title="Conteúdo de outro professor",
+            subtitle="Externo",
+            description="Descrição",
+            author=self.other_teacher,
+            status=Content.Status.PUBLISHED,
+            published_at=now,
+        )
+
+        activity = Activity.objects.create(
+            title="Tarefa para corrigir",
+            description="Descrição",
+            kind=Activity.Kind.ATIVIDADE,
+            status=Activity.Status.PUBLISHED,
+            total_score=100,
+            created_by=self.teacher,
+        )
+        other_activity = Activity.objects.create(
+            title="Tarefa alheia",
+            description="Descrição",
+            kind=Activity.Kind.ATIVIDADE,
+            status=Activity.Status.PUBLISHED,
+            total_score=100,
+            created_by=self.other_teacher,
+        )
+
+        expected_titles = []
+        for index in range(6):
+            student = User.objects.create_user(
+                username=f"student-review-{index}",
+                email=f"student-review-{index}@example.com",
+                password="demo123456",
+            )
+            student.profile.role = UserProfile.Role.ALUNO
+            student.profile.display_name = f"Aluno {index + 1}"
+            student.profile.save()
+
+            submission = Submission.objects.create(
+                activity=activity,
+                student=student,
+                status=Submission.Status.SUBMITTED,
+                submitted_at=now - timedelta(hours=6 - index),
+            )
+            if index < 5:
+                expected_titles.append(student.profile.display_name)
+
+        foreign_student = User.objects.create_user(
+            username="student-review-foreign",
+            email="student-review-foreign@example.com",
+            password="demo123456",
+        )
+        foreign_student.profile.role = UserProfile.Role.ALUNO
+        foreign_student.profile.display_name = "Aluno Externo"
+        foreign_student.profile.save()
+        Submission.objects.create(
+            activity=other_activity,
+            student=foreign_student,
+            status=Submission.Status.SUBMITTED,
+            submitted_at=now - timedelta(days=1),
+        )
+        reviewed_submission = Submission.objects.create(
+            activity=activity,
+            student=self.student,
+            status=Submission.Status.REVIEWED,
+            submitted_at=now - timedelta(days=2),
+        )
+        Review.objects.create(
+            submission=reviewed_submission,
+            reviewed_by=self.teacher,
+            score=90,
+            comment="Corrigido",
+        )
+
+        response = self.client.get(
+            reverse("teacher-home-summary"), **self._auth(self.teacher_session)
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(
+            [item["id"] for item in payload["recentContents"]],
+            recent_content_ids[:3],
+        )
+        self.assertEqual(len(payload["pendingReviews"]), 5)
+        self.assertEqual(
+            [item["studentName"] for item in payload["pendingReviews"]],
+            expected_titles,
+        )
+        self.assertTrue(
+            all(item["activityTitle"] == "Tarefa para corrigir" for item in payload["pendingReviews"])
+        )
 
 
 class GamesFlowTests(TestCase):

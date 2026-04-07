@@ -18,6 +18,8 @@ import type {
   PersonalCalendarNote,
   RegisterGameSessionRequest,
   ReviewPayload,
+  StudentHomeSummary,
+  TeacherHomeSummary,
   ProfileResponse,
   SubmissionDetail,
   SubmissionListItem,
@@ -350,6 +352,14 @@ export function apiCommunityPosts(
     token,
     `/community/posts/${query ? `?${query}` : ""}`,
   );
+}
+
+export function apiStudentHomeSummary(token: string): Promise<StudentHomeSummary> {
+  return authorizedRequest<StudentHomeSummary>(token, "/home/student-summary/");
+}
+
+export function apiTeacherHomeSummary(token: string): Promise<TeacherHomeSummary> {
+  return authorizedRequest<TeacherHomeSummary>(token, "/home/teacher-summary/");
 }
 
 export function apiCommunityPostDetail(

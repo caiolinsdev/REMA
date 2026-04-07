@@ -80,6 +80,17 @@ export type {
 } from "./games/types";
 
 export type {
+  StudentHomeUpcomingItemSource,
+  StudentHomeUpcomingItem,
+  StudentHomeSummary,
+  TeacherHomePendingReview,
+  TeacherHomeSummary,
+  StudentHomeRecentPost,
+  TeacherHomeRecentContent,
+  StudentHomePersonalNote,
+} from "./home/types";
+
+export type {
   ProfileResponse,
   UpdateProfileRequest,
   UpdateAvatarRequest,
