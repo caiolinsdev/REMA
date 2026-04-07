@@ -2,15 +2,15 @@
 
 ## Objetivo
 
-Descrever as jornadas minimas dos fluxos vistos no diagrama, com foco em
-entrada, navegacao e valor principal de cada view.
+Descrever as jornadas mínimas dos fluxos vistos no diagrama, com foco em
+entrada, navegação e valor principal de cada view.
 
 ## Fluxo Macro
 
 ```mermaid
 flowchart LR
   login[Login] --> authOk{Autenticado}
-  authOk -->|Nao| loginError[Erro ou nova tentativa]
+  authOk -->|Não| loginError[Erro ou nova tentativa]
   authOk -->|Sim| roleCheck{Perfil}
   roleCheck -->|Aluno| alunoHome[HomeAluno]
   roleCheck -->|Professor| professorHome[HomeProfessor]
@@ -45,51 +45,49 @@ flowchart LR
 Objetivo:
 Dar visibilidade imediata da rotina do estudante.
 
-Conteudo esperado:
+Conteúdo esperado:
 
-- proximas atividades
-- proximas provas
-- proximos trabalhos
-- destaques de conteudos
+- próximas tarefas
+- destaques de conteúdos
 - agenda do dia ou da semana
 - atalhos para jogos e comunidade
 
-Saidas:
+Saídas:
 
-- acessar atividades
-- abrir conteudos
-- abrir calendario
+- acessar tarefas
+- abrir conteúdos
+- abrir calendário
 - ir para jogos
 - ir para comunidade
 - abrir perfil
 
-### Provas / Atividades / Trabalhos do Aluno
+### Tarefas do Aluno
 
 Objetivo:
 Permitir ao aluno acompanhar o que precisa fazer.
 
-Passos minimos:
+Passos mínimos:
 
-1. Ver lista de provas, atividades e trabalhos
+1. Ver lista de tarefas
 2. Entrar no detalhe de um item
-3. Entender prazo, status e orientacoes
-4. Responder questoes ou anexar arquivo
+3. Entender prazo, status e orientações
+4. Responder questões ou anexar arquivo
 5. Confirmar envio
-6. Acompanhar resultado depois da avaliacao
+6. Acompanhar resultado depois da avaliação
 
 Regras conhecidas:
 
-- `Prova` e `Atividade` sao compostas por questoes
-- `Trabalho` exige upload de `PDF`, `Word` ou `TXT`
-- O aluno so pode enviar uma vez
-- Depois do envio nao pode editar nem reenviar
-- O aluno deve ver uma confirmacao antes do envio final
+- Tarefas com questões são compostas por questões
+- Tarefas com anexo exigem upload de `PDF`, `Word` ou `TXT`
+- O aluno só pode enviar uma vez
+- Depois do envio não pode editar nem reenviar
+- O aluno deve ver uma confirmação antes do envio final
 - A view pode ser reaproveitada para consulta posterior de nota e retorno
-- Questoes podem ser:
+- Questões podem ser:
   - dissertativas
-  - multipla escolha com ate `5` opcoes
-- Questoes podem conter imagem
-- Explicacao de resposta nao fica visivel durante a realizacao
+  - multipla escolha com até `5` opções
+- Questões podem conter imagem
+- A explicação de resposta não fica visível durante a realização
 
 Estados desejados:
 
@@ -99,33 +97,33 @@ Estados desejados:
 - corrigido
 - expirado
 
-### Conteudos do Aluno
+### Conteúdos do Aluno
 
 Objetivo:
 Permitir descoberta e consumo de materiais.
 
-Passos minimos:
+Passos mínimos:
 
-1. Ver lista de conteudos
+1. Ver lista de conteúdos
 2. Filtrar ou navegar por categoria
 3. Abrir detalhe
 4. Consumir material
 
-Informacoes minimas da view:
+Informações mínimas da view:
 
 - titulo
 - subtitulo
-- descricao
+- descrição
 - autor
 - data de postagem
 - imagem ou video quando houver
 
-### Calendario do Aluno
+### Calendário do Aluno
 
 Objetivo:
 Organizar a rotina e antecipar prazos.
 
-Passos minimos:
+Passos mínimos:
 
 1. Visualizar eventos e prazos
 2. Abrir detalhes do evento
@@ -134,19 +132,17 @@ Passos minimos:
 
 Eventos base esperados:
 
-- entregas de atividades
-- entregas de provas
-- entregas de trabalhos
-- anotacoes do proprio aluno
+- entregas de tarefas
+- anotações do próprio aluno
 
 ### Jogos do Aluno
 
 Objetivo:
 Estimular aprendizagem e engajamento.
 
-Passos minimos:
+Passos mínimos:
 
-1. Ver catalogo ou area de jogos
+1. Ver catálogo ou área de jogos
 2. Escolher experiencia
 3. Iniciar interacao
 4. Ver retorno de progresso ou pontuacao, se existir
@@ -191,76 +187,76 @@ Passos minimos:
 Objetivo:
 Ser a central operacional do trabalho diario.
 
-Conteudo esperado:
+Conteúdo esperado:
 
-- atividades recentes
-- trabalhos pendentes de avaliacao
-- conteudos criados ou pendentes
-- eventos do calendario
+- tarefas recentes
+- tarefas com anexo pendentes de avaliação
+- conteúdos criados ou pendentes
+- eventos do calendário
 - atalhos para comunidade e perfil
 
-Saidas:
+Saídas:
 
-- criar ou abrir atividades
-- abrir conteudos
-- abrir calendario
+- criar ou abrir tarefas
+- abrir conteúdos
+- abrir calendário
 - abrir comunidade
 - abrir perfil
 
-### Provas / Atividades / Trabalhos do Professor
+### Tarefas do Professor
 
 Objetivo:
-Permitir criar e acompanhar atividades.
+Permitir criar e acompanhar tarefas.
 
-Passos minimos:
+Passos mínimos:
 
-1. Ver lista de atividades
-2. Escolher se vai criar prova, atividade ou trabalho
-3. Configurar informacoes principais
-4. Montar questoes ou descricao do trabalho
-5. Validar pontuacao
+1. Ver lista de tarefas
+2. Escolher o comportamento da tarefa
+3. Configurar informações principais
+4. Montar questões ou descrição da tarefa com anexo
+5. Validar pontuação
 6. Publicar
 7. Acompanhar entregas e status
 8. Corrigir e registrar nota
 
 Regras conhecidas:
 
-- provas e atividades possuem ate `100` questoes
-- pontuacao maxima do item e `100`
-- a soma dos valores das questoes deve resultar em `100`
-- questoes podem ser dissertativas ou multipla escolha com ate `5` opcoes
-- questoes podem ter imagem
-- questoes podem ter explicacao esperada ou gabarito nao visivel ao aluno
-- trabalho exige comentario obrigatorio ao validar nota do aluno
+- tarefas com questões possuem até `100` questões
+- a pontuação máxima do item é `100`
+- a soma dos valores das questões deve resultar em `100`
+- questões podem ser dissertativas ou multipla escolha com até `5` opções
+- questões podem ter imagem
+- questões podem ter explicação esperada ou gabarito não visível ao aluno
+- tarefa com anexo exige comentário obrigatório ao validar a nota do aluno
 
-### Conteudos do Professor
+### Conteúdos do Professor
 
 Objetivo:
 Publicar e manter materiais de apoio.
 
-Passos minimos:
+Passos mínimos:
 
-1. Ver lista de conteudos
-2. Criar novo conteudo
+1. Ver lista de conteúdos
+2. Criar novo conteúdo
 3. Editar ou organizar
 4. Publicar, editar ou excluir
 
-Campos minimos do conteudo:
+Campos mínimos do conteúdo:
 
 - titulo obrigatorio
 - subtitulo obrigatorio
-- descricao obrigatoria
+- descrição obrigatória
 - data de postagem obrigatoria
 - autor obrigatorio
 - imagem opcional
 - video opcional
 
-### Calendario do Professor
+### Calendário do Professor
 
 Objetivo:
-Acompanhar compromissos e datas academicas.
+Acompanhar compromissos e datas acadêmicas.
 
-Passos minimos:
+Passos mínimos:
 
 1. Visualizar agenda
 2. Entrar em evento
@@ -268,7 +264,7 @@ Passos minimos:
 
 Integracoes esperadas:
 
-- refletir datas de entrega de provas, atividades e trabalhos
+- refletir datas de entrega de tarefas
 
 ### Comunidade do Professor
 
@@ -303,8 +299,8 @@ Passos minimos:
 
 - aluno sem atividades
 - aluno sem notas publicadas
-- professor sem conteudos publicados
-- calendario sem eventos
+- professor sem conteúdos publicados
+- calendário sem eventos
 - comunidade sem publicacoes
 - post de aluno aguardando aprovacao
 - perfil incompleto

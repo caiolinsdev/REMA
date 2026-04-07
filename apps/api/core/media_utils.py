@@ -57,12 +57,12 @@ MEDIA_RULES: dict[str, MediaRule] = {
 def validate_uploaded_file(file, *, kind: str) -> MediaRule:
     rule = MEDIA_RULES.get(kind)
     if rule is None:
-        raise ValueError("Tipo de midia invalido.")
+        raise ValueError("Tipo de mídia inválido.")
 
     extension = Path(file.name or "").suffix.lower()
     if extension not in rule.allowed_extensions:
         allowed = ", ".join(sorted(ext.lstrip(".") for ext in rule.allowed_extensions))
-        raise ValueError(f"Formato invalido para este contexto. Use: {allowed}.")
+        raise ValueError(f"Formato inválido para este contexto. Use: {allowed}.")
 
     if file.size > rule.max_size_bytes:
         limit_mb = rule.max_size_bytes // (1024 * 1024)
@@ -70,9 +70,9 @@ def validate_uploaded_file(file, *, kind: str) -> MediaRule:
 
     content_type = str(getattr(file, "content_type", "") or "").lower()
     if rule.expected_type_prefix and not content_type.startswith(rule.expected_type_prefix):
-        raise ValueError("Tipo de arquivo invalido para este contexto.")
+        raise ValueError("Tipo de arquivo inválido para este contexto.")
     if rule.expected_content_types and content_type not in rule.expected_content_types:
-        raise ValueError("Tipo de arquivo invalido para este contexto.")
+        raise ValueError("Tipo de arquivo inválido para este contexto.")
 
     return rule
 
@@ -104,14 +104,14 @@ def validate_controlled_media_url(
 
     relative_path = path[len(settings.MEDIA_URL) :].lstrip("/")
     if not relative_path:
-        raise ValueError("Arquivo de midia invalido.")
+        raise ValueError("Arquivo de mídia inválido.")
 
     from core.models import MediaAsset
 
     asset = MediaAsset.objects.filter(file=relative_path).first()
     if asset is None:
-        raise ValueError("Arquivo de midia nao encontrado.")
+        raise ValueError("Arquivo de mídia não encontrado.")
     if allowed_kinds and asset.kind not in allowed_kinds:
-        raise ValueError("Tipo de midia invalido para este campo.")
+        raise ValueError("Tipo de mídia inválido para este campo.")
 
     return raw_value

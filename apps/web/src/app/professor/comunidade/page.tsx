@@ -109,20 +109,20 @@ export default function Page() {
       <div>
         <h1 style={{ marginTop: 0 }}>Comunidade</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          Feed privado entre professores e fila de moderacao dos posts de alunos.
+          Feed privado entre professores e fila de moderação dos posts de alunos.
         </p>
       </div>
       {error ? <div style={{ color: "#b91c1c" }}>{error}</div> : null}
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 12 }}>
         <h2 style={{ margin: 0 }}>Novo post para professores</h2>
-        <input placeholder="Titulo do aviso" value={title} onChange={(e) => setTitle(e.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
+        <input placeholder="Título do aviso" value={title} onChange={(e) => setTitle(e.target.value)} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
         <textarea placeholder="Compartilhe combinados e trocas internas" value={body} onChange={(e) => setBody(e.target.value)} rows={5} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
         <label style={{ display: "grid", gap: 6 }}>
           <span>Imagem opcional</span>
           <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void uploadMedia(event, "community_image")} />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Video opcional</span>
+          <span>Vídeo opcional</span>
           <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={(event) => void uploadMedia(event, "community_video")} />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
@@ -133,11 +133,11 @@ export default function Page() {
         {videoUrl ? <video src={videoUrl} controls style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #cbd5e1" }} /> : null}
         {gifUrl ? <MediaImage src={gifUrl} alt="Preview do gif do post" style={{ width: 180, borderRadius: 12, border: "1px solid #cbd5e1" }} /> : null}
         <button type="button" onClick={() => void submitTeacherPost()} style={{ width: "fit-content", borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}>
-          {uploadingKind ? "Enviando arquivo…" : "Publicar no feed privado"}
+          {uploadingKind ? "Enviando arquivo..." : "Publicar no feed privado"}
         </button>
       </section>
       <section style={{ display: "grid", gap: 12 }}>
-        <h2 style={{ margin: 0 }}>Fila de moderacao</h2>
+        <h2 style={{ margin: 0 }}>Fila de moderação</h2>
         {moderationQueue.map((post) => (
           <article key={post.id} style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 12 }}>
             <div>
@@ -158,7 +158,7 @@ export default function Page() {
           </article>
         ))}
         {moderationQueue.length === 0 ? (
-          <div style={{ color: "#64748b" }}>Nenhuma pendencia no momento.</div>
+          <div style={{ color: "#64748b" }}>Nenhuma pendência no momento.</div>
         ) : null}
       </section>
       <section style={{ display: "grid", gap: 12 }}>

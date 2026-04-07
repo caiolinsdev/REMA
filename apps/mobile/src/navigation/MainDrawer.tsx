@@ -13,9 +13,9 @@ const Drawer = createDrawerNavigator();
 
 const alunoScreens: { name: string; title: string; subtitle?: string }[] = [
   { name: "AlunoHome", title: "Home", subtitle: "Resumo (waves seguintes)." },
-  { name: "AlunoAtividades", title: "Provas / atividades / trabalhos", subtitle: "Wave 2+." },
-  { name: "AlunoConteudos", title: "Conteudos", subtitle: "Wave 4." },
-  { name: "AlunoCalendario", title: "Calendario", subtitle: "Wave 4." },
+  { name: "AlunoAtividades", title: "Tarefas", subtitle: "Wave 2+." },
+  { name: "AlunoConteudos", title: "Conteúdos", subtitle: "Wave 4." },
+  { name: "AlunoCalendario", title: "Calendário", subtitle: "Wave 4." },
   { name: "AlunoJogos", title: "Jogos", subtitle: "Wave 6." },
   { name: "AlunoComunidade", title: "Comunidade", subtitle: "Wave 5." },
   { name: "AlunoPerfil", title: "Perfil", subtitle: "Wave 5." },
@@ -23,9 +23,9 @@ const alunoScreens: { name: string; title: string; subtitle?: string }[] = [
 
 const professorScreens: { name: string; title: string; subtitle?: string }[] = [
   { name: "ProfHome", title: "Home", subtitle: "Resumo (waves seguintes)." },
-  { name: "ProfAtividades", title: "Provas / atividades / trabalhos", subtitle: "Wave 2+." },
-  { name: "ProfConteudos", title: "Conteudos", subtitle: "Wave 4." },
-  { name: "ProfCalendario", title: "Calendario", subtitle: "Wave 4." },
+  { name: "ProfAtividades", title: "Tarefas", subtitle: "Wave 2+." },
+  { name: "ProfConteudos", title: "Conteúdos", subtitle: "Wave 4." },
+  { name: "ProfCalendario", title: "Calendário", subtitle: "Wave 4." },
   { name: "ProfComunidade", title: "Comunidade", subtitle: "Wave 5." },
   { name: "ProfPerfil", title: "Perfil", subtitle: "Wave 5." },
 ];

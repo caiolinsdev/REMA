@@ -83,7 +83,7 @@ def game_sessions_collection(request, game_id: int):
         score = int(request.data.get("score", 0))
         progress = int(request.data.get("progress", 0))
     except (TypeError, ValueError):
-        return _error("Score e progresso devem ser numericos.")
+        return _error("Score e progresso devem ser numéricos.")
 
     if score < 0 or score > 100:
         return _error("Score deve ficar entre 0 e 100.")

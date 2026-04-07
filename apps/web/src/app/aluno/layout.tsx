@@ -3,9 +3,9 @@ import { RoleGuard } from "@/components/RoleGuard";
 
 const navItems = [
   { href: "/aluno", label: "Home" },
-  { href: "/aluno/atividades", label: "Provas / atividades / trabalhos" },
-  { href: "/aluno/conteudos", label: "Conteudos" },
-  { href: "/aluno/calendario", label: "Calendario" },
+  { href: "/aluno/atividades", label: "Tarefas" },
+  { href: "/aluno/conteudos", label: "Conteúdos" },
+  { href: "/aluno/calendario", label: "Calendário" },
   { href: "/aluno/jogos", label: "Jogos" },
   { href: "/aluno/comunidade", label: "Comunidade" },
   { href: "/aluno/perfil", label: "Perfil" },

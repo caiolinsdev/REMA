@@ -69,20 +69,20 @@ def _normalize_answers(activity: Activity, raw_answers) -> list[dict]:
         try:
             question_id = int(answer.get("questionId"))
         except (TypeError, ValueError) as exc:
-            raise ValueError("Resposta com questionId invalido.") from exc
+            raise ValueError("Resposta com questionId inválido.") from exc
         question = questions.get(question_id)
         if question is None:
-            raise ValueError("Questao nao pertence a atividade.")
+            raise ValueError("Questão não pertence à tarefa.")
         selected_option_id = answer.get("selectedOptionId")
         option = None
         if selected_option_id not in (None, ""):
             try:
                 selected_option_id = int(selected_option_id)
             except (TypeError, ValueError) as exc:
-                raise ValueError("Opcao selecionada invalida.") from exc
+                raise ValueError("Opção selecionada inválida.") from exc
             option = question.options.filter(pk=selected_option_id).first()
             if option is None:
-                raise ValueError("Opcao selecionada nao pertence a questao.")
+                raise ValueError("Opção selecionada não pertence à questão.")
         normalized.append(
             {
                 "question": question,
@@ -111,7 +111,7 @@ def _normalize_files(raw_files) -> list[dict]:
         extension = Path(file_name).suffix.lower().removeprefix(".")
         effective_type = file_type or extension
         if effective_type not in ALLOWED_WORK_FILE_TYPES:
-            raise ValueError("Tipo de arquivo invalido. Use pdf, doc, docx ou txt.")
+            raise ValueError("Tipo de arquivo inválido. Use pdf, doc, docx ou txt.")
         normalized.append(
             {
                 "file_name": file_name,
@@ -141,7 +141,7 @@ def activity_submissions_collection(request, activity_id: int):
     if request.method == "GET":
         if not _is_professor(request.user) or activity.created_by_id != request.user.id:
             return _error(
-                "Apenas professores podem consultar os envios da atividade.",
+                "Apenas professores podem consultar os envios da tarefa.",
                 code="forbidden_role",
                 http_status=status.HTTP_403_FORBIDDEN,
             )
@@ -155,11 +155,11 @@ def activity_submissions_collection(request, activity_id: int):
             http_status=status.HTTP_403_FORBIDDEN,
         )
     if activity.status != Activity.Status.PUBLISHED:
-        return _error("A atividade nao esta disponivel para envio.")
+        return _error("A tarefa não está disponível para envio.")
 
     submission, _ = Submission.objects.get_or_create(activity=activity, student=request.user)
     if submission.status in {Submission.Status.SUBMITTED, Submission.Status.REVIEWED}:
-        return _error("Nao e possivel editar apos o envio final.")
+        return _error("Não é possível editar após o envio final.")
 
     try:
         answers = _normalize_answers(activity, request.data.get("answers"))
@@ -169,11 +169,11 @@ def activity_submissions_collection(request, activity_id: int):
 
     if activity.kind == Activity.Kind.TRABALHO:
         if answers:
-            return _error("Trabalhos nao aceitam respostas por questao nesta fase.")
+            return _error("Tarefas com anexo não aceitam respostas por questão nesta fase.")
         if len(files) > 1:
-            return _error("Trabalho aceita apenas um arquivo no envio inicial.")
+            return _error("Tarefas com anexo aceitam apenas um arquivo no envio inicial.")
     elif files:
-        return _error("Apenas trabalhos aceitam anexo nesta fase.")
+        return _error("Apenas tarefas com anexo aceitam arquivo nesta fase.")
 
     with transaction.atomic():
         if request.data.get("answers") is not None:
@@ -214,7 +214,7 @@ def current_submission(request, activity_id: int):
     activity = get_object_or_404(Activity, pk=activity_id)
     if not _is_student(request.user):
         return _error(
-            "Apenas alunos podem consultar o proprio envio.",
+            "Apenas alunos podem consultar o próprio envio.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
@@ -242,13 +242,13 @@ def submission_confirm(request, submission_id: int):
             http_status=status.HTTP_403_FORBIDDEN,
         )
     if submission.status in {Submission.Status.SUBMITTED, Submission.Status.REVIEWED}:
-        return _error("Nao e possivel reenviar apos confirmacao.")
+        return _error("Não é possível reenviar após a confirmação.")
     if submission.activity.status != Activity.Status.PUBLISHED:
-        return _error("A atividade nao esta recebendo envios.")
+        return _error("A tarefa não está recebendo envios.")
 
     if submission.activity.kind == Activity.Kind.TRABALHO:
         if submission.files.count() != 1:
-            return _error("Trabalho exige exatamente um anexo antes da confirmacao.")
+            return _error("A tarefa com anexo exige exatamente um arquivo antes da confirmação.")
 
     submission.status = Submission.Status.SUBMITTED
     submission.submitted_at = timezone.now()
@@ -268,14 +268,14 @@ def submission_review(request, submission_id: int):
             http_status=status.HTTP_403_FORBIDDEN,
         )
     if submission.activity.created_by_id != request.user.id:
-        return _error("Envio nao encontrado.", code="not_found", http_status=404)
+        return _error("Envio não encontrado.", code="not_found", http_status=404)
     if submission.status not in {Submission.Status.SUBMITTED, Submission.Status.REVIEWED}:
         return _error("O envio precisa estar submetido para ser corrigido.")
 
     try:
         score = int(request.data.get("score"))
     except (TypeError, ValueError):
-        return _error("Nota invalida.")
+        return _error("Nota inválida.")
     comment = str(request.data.get("comment") or "").strip()
     if not 0 <= score <= 100:
         return _error("Nota deve ficar entre 0 e 100.")
@@ -283,7 +283,7 @@ def submission_review(request, submission_id: int):
         submission.activity.kind == Activity.Kind.TRABALHO
         and not comment
     ):
-        return _error("Comentario do professor e obrigatorio em trabalho.")
+        return _error("Comentário do professor é obrigatório em tarefas com anexo.")
 
     Review.objects.update_or_create(
         submission=submission,

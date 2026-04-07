@@ -54,7 +54,7 @@ export function ContentEditor({ mode, contentId }: Props) {
         setImageUrl(content.imageUrl ?? "");
         setVideoUrl(content.videoUrl ?? "");
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteudo"))
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteúdo"))
       .finally(() => setLoading(false));
   }, [contentId, mode, router]);
 
@@ -81,7 +81,7 @@ export function ContentEditor({ mode, contentId }: Props) {
           : await apiUpdateContent(token, contentId!, body);
       router.push(`/professor/conteudos/${content.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao salvar conteudo");
+      setError(err instanceof Error ? err.message : "Falha ao salvar conteúdo");
     } finally {
       setSaving(false);
     }
@@ -123,15 +123,15 @@ export function ContentEditor({ mode, contentId }: Props) {
   }
 
   if (loading) {
-    return <p style={{ color: "#64748b" }}>Carregando conteudo…</p>;
+    return <p style={{ color: "#64748b" }}>Carregando conteúdo...</p>;
   }
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
-        <h1 style={{ marginTop: 0 }}>{mode === "create" ? "Novo conteudo" : "Editar conteudo"}</h1>
+        <h1 style={{ marginTop: 0 }}>{mode === "create" ? "Novo conteúdo" : "Editar conteúdo"}</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          Conteudos nascem em <code>draft</code> e podem ser publicados quando estiverem prontos.
+          Conteúdos nascem em <code>draft</code> e podem ser publicados quando estiverem prontos.
         </p>
       </div>
 
@@ -141,23 +141,23 @@ export function ContentEditor({ mode, contentId }: Props) {
 
       <form onSubmit={onSubmit} style={{ ...panelStyle, display: "grid", gap: 14 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Titulo</span>
+          <span>Título</span>
           <input value={title} onChange={(event) => setTitle(event.target.value)} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Subtitulo</span>
+          <span>Subtítulo</span>
           <input value={subtitle} onChange={(event) => setSubtitle(event.target.value)} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={6} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
         </label>
         <div style={{ display: "grid", gap: 8 }}>
-          <span>Imagem do conteudo</span>
+          <span>Imagem do conteúdo</span>
           {imageUrl ? (
             <MediaImage
               src={imageUrl}
-              alt="Preview da imagem do conteudo"
+              alt="Preview da imagem do conteúdo"
               style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #cbd5e1" }}
             />
           ) : null}
@@ -167,18 +167,18 @@ export function ContentEditor({ mode, contentId }: Props) {
           </button>
         </div>
         <div style={{ display: "grid", gap: 8 }}>
-          <span>Video do conteudo</span>
+          <span>Vídeo do conteúdo</span>
           {videoUrl ? (
             <video src={videoUrl} controls style={{ width: "100%", maxWidth: 420, borderRadius: 12, border: "1px solid #cbd5e1" }} />
           ) : null}
           <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={(event) => void handleUpload(event, "content_video")} />
           <button type="button" onClick={() => setVideoUrl("")} disabled={!videoUrl || uploadingVideo} style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}>
-            {uploadingVideo ? "Enviando video…" : "Remover video"}
+            {uploadingVideo ? "Enviando vídeo..." : "Remover vídeo"}
           </button>
         </div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <button type="submit" disabled={saving} style={{ borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}>
-            {saving ? "Salvando…" : mode === "create" ? "Criar draft" : "Salvar alteracoes"}
+            {saving ? "Salvando..." : mode === "create" ? "Criar draft" : "Salvar alterações"}
           </button>
           <button type="button" onClick={() => router.back()} style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "12px 16px", background: "#fff", cursor: "pointer" }}>
             Cancelar

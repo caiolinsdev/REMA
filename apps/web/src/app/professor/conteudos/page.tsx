@@ -8,7 +8,7 @@ import { apiContents } from "@/lib/api";
 import { getStoredToken } from "@/lib/cookies";
 
 function formatPublished(value: string) {
-  if (!value) return "Nao publicado";
+  if (!value) return "Não publicado";
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
@@ -24,20 +24,20 @@ export default function Page() {
     if (!token) return;
     apiContents(token)
       .then(setContents)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteudos"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteúdos"));
   }, []);
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ marginTop: 0 }}>Conteudos</h1>
+          <h1 style={{ marginTop: 0 }}>Conteúdos</h1>
           <p style={{ color: "#64748b", lineHeight: 1.6 }}>
             Professores criam, editam e publicam materiais de apoio.
           </p>
         </div>
         <Link href="/professor/conteudos/novo" style={{ borderRadius: 10, background: "#2563eb", color: "#fff", textDecoration: "none", padding: "12px 16px", fontWeight: 600 }}>
-          Novo conteudo
+          Novo conteúdo
         </Link>
       </div>
 
@@ -61,7 +61,7 @@ export default function Page() {
         ))}
         {contents.length === 0 && !error ? (
           <div style={{ border: "1px dashed #cbd5e1", borderRadius: 16, padding: 18, color: "#64748b" }}>
-            Nenhum conteudo criado ainda.
+            Nenhum conteúdo criado ainda.
           </div>
         ) : null}
       </div>

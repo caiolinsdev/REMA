@@ -16,13 +16,13 @@ export default function Page() {
     if (!token) return;
     apiContents(token)
       .then(setContents)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteudos"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteúdos"));
   }, []);
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
-        <h1 style={{ marginTop: 0 }}>Conteudos</h1>
+        <h1 style={{ marginTop: 0 }}>Conteúdos</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
           Biblioteca de materiais publicados pelos professores.
         </p>
@@ -36,13 +36,13 @@ export default function Page() {
             <h2 style={{ margin: "0 0 8px" }}>{content.title}</h2>
             <p style={{ margin: "0 0 12px", color: "#64748b" }}>{content.subtitle}</p>
             <Link href={`/aluno/conteudos/${content.id}`} style={{ color: "#2563eb", fontWeight: 600 }}>
-              Ver conteudo
+              Ver conteúdo
             </Link>
           </article>
         ))}
         {contents.length === 0 && !error ? (
           <div style={{ border: "1px dashed #cbd5e1", borderRadius: 16, padding: 18, color: "#64748b" }}>
-            Nenhum conteudo publicado ainda.
+            Nenhum conteúdo publicado ainda.
           </div>
         ) : null}
       </div>

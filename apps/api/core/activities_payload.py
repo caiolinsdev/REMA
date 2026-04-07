@@ -70,7 +70,7 @@ def validation_summary_for(
             issues.append(
                 {
                     "code": "question_limit_exceeded",
-                    "message": "Provas e atividades aceitam no maximo 100 questoes.",
+                    "message": "Tarefas com questões aceitam no máximo 100 questões.",
                 }
             )
         total_weight = sum(int(question.get("weight") or 0) for question in normalized_questions)
@@ -78,7 +78,7 @@ def validation_summary_for(
             issues.append(
                 {
                     "code": "question_weights_must_sum_100",
-                    "message": "A soma dos pesos das questoes deve ser 100.",
+                    "message": "A soma dos pesos das questões deve ser 100.",
                 }
             )
 
@@ -86,7 +86,7 @@ def validation_summary_for(
         issues.append(
             {
                 "code": "trabalho_requires_description",
-                "message": "Trabalho precisa de descricao clara do que deve ser feito.",
+                "message": "Tarefa com anexo precisa de descrição clara do que deve ser feito.",
             }
         )
 
@@ -99,7 +99,7 @@ def validation_summary_for(
         issues.append(
             {
                 "code": "multiple_choice_limit_exceeded",
-                "message": "Questoes de multipla escolha aceitam no maximo 5 opcoes.",
+                "message": "Questões de múltipla escolha aceitam no máximo 5 opções.",
             }
         )
 

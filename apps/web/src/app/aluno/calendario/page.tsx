@@ -90,7 +90,7 @@ function toCalendarItem(event: CalendarEventSummary): CalendarItem {
     startAt: event.startAt,
     endAt: event.endAt,
     category: "academic_deadline",
-    label: "Prazo academico",
+    label: "Prazo acadêmico",
     color: "#b45309",
   };
 }
@@ -133,7 +133,7 @@ export default function Page() {
 
   useEffect(() => {
     loadCalendar().catch((err) =>
-      setError(err instanceof Error ? err.message : "Falha ao carregar calendario"),
+      setError(err instanceof Error ? err.message : "Falha ao carregar calendário"),
     );
   }, []);
 
@@ -202,9 +202,9 @@ export default function Page() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
-        <h1 style={{ marginTop: 0 }}>Calendario</h1>
+        <h1 style={{ marginTop: 0 }}>Calendário</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          Veja prazos academicos, eventos manuais e notas pessoais na mesma agenda mensal.
+          Veja prazos acadêmicos, eventos manuais e notas pessoais na mesma agenda mensal.
         </p>
       </div>
 
@@ -219,7 +219,7 @@ export default function Page() {
           <div>
             <h2 style={{ margin: 0, textTransform: "capitalize" }}>{formatMonthLabel(currentMonth)}</h2>
             <p style={{ margin: "6px 0 0", color: "#64748b" }}>
-              Clique num dia para ver detalhes e criar uma nota pessoal.
+              Clique em um dia para ver detalhes e criar uma nota pessoal.
             </p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
@@ -228,7 +228,7 @@ export default function Page() {
               onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
               style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
             >
-              Mes anterior
+              Mês anterior
             </button>
             <button
               type="button"
@@ -245,13 +245,13 @@ export default function Page() {
               onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
               style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
             >
-              Proximo mes
+              Próximo mês
             </button>
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 14 }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span style={{ width: 10, height: 10, borderRadius: 999, background: "#b45309" }} /> Prazo academico</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span style={{ width: 10, height: 10, borderRadius: 999, background: "#b45309" }} /> Prazo acadêmico</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span style={{ width: 10, height: 10, borderRadius: 999, background: "#0f766e" }} /> Evento</span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span style={{ width: 10, height: 10, borderRadius: 999, background: "#2563eb" }} /> Nota pessoal</span>
         </div>
@@ -365,20 +365,20 @@ export default function Page() {
           <div>
             <h2 style={{ margin: 0 }}>Nova nota pessoal</h2>
             <p style={{ margin: "6px 0 0", color: "#64748b" }}>
-              A nota entra automaticamente no dia selecionado do calendario.
+              A nota entra automaticamente no dia selecionado do calendário.
             </p>
           </div>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Titulo"
+            placeholder="Título"
             required
             style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
           />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Descricao"
+            placeholder="Descrição"
             rows={4}
             required
             style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }}

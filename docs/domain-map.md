@@ -63,7 +63,7 @@ Campos iniciais sugeridos:
 
 ### Activity
 
-Representa o item academico principal do sistema.
+Representa o item acadêmico principal do sistema.
 
 Campos iniciais sugeridos:
 
@@ -78,11 +78,12 @@ Campos iniciais sugeridos:
 
 Observacao:
 
-- `kind` pode assumir inicialmente `prova`, `atividade` ou `trabalho`
+- `kind` pode assumir internamente `prova`, `atividade` ou `trabalho`
+- na linguagem de produto, todos esses itens são tratados como `tarefas`
 
 ### Question
 
-Representa cada questao de uma prova ou atividade.
+Representa cada questão de uma tarefa com questões.
 
 Campos iniciais sugeridos:
 
@@ -98,7 +99,7 @@ Campos iniciais sugeridos:
 Observacao:
 
 - `type` pode assumir inicialmente `dissertativa` ou `multipla_escolha`
-- cada `Activity` do tipo `prova` ou `atividade` pode ter ate `100` questoes
+- cada `Activity` do tipo `prova` ou `atividade` pode ter até `100` questões
 
 ### QuestionOption
 
@@ -137,7 +138,7 @@ Observacao:
 
 ### SubmissionAnswer
 
-Representa a resposta do aluno por questao em provas e atividades.
+Representa a resposta do aluno por questão em tarefas com questões.
 
 Campos iniciais sugeridos:
 
@@ -149,7 +150,7 @@ Campos iniciais sugeridos:
 
 ### SubmissionFile
 
-Representa o anexo enviado em um trabalho.
+Representa o anexo enviado em uma tarefa com anexo.
 
 Campos iniciais sugeridos:
 
@@ -178,7 +179,7 @@ Campos iniciais sugeridos:
 
 Observacao:
 
-- em `trabalho`, o comentario do professor e obrigatorio
+- em `trabalho`, o comentário do professor é obrigatório
 
 ### CalendarEvent
 
@@ -196,7 +197,7 @@ Campos iniciais sugeridos:
 
 ### PersonalCalendarNote
 
-Representa anotacao individual criada pelo aluno no calendario.
+Representa anotação individual criada pelo aluno no calendário.
 
 Campos iniciais sugeridos:
 
@@ -313,7 +314,7 @@ flowchart LR
 - agrega `Activity`, `Content`, `CalendarEvent`, `CommunityPost` e possivelmente
   `GameSession`
 
-### Provas / Atividades
+### Tarefas
 
 - `Activity`
 - `Question`
@@ -323,11 +324,11 @@ flowchart LR
 - `SubmissionFile`
 - `Review`
 
-### Conteudos
+### Conteúdos
 
 - `Content`
 
-### Calendario
+### Calendário
 
 - `CalendarEvent`
 - `PersonalCalendarNote`

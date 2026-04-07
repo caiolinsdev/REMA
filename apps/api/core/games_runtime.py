@@ -164,7 +164,7 @@ def _normalize_word(word: str) -> str:
     ascii_word = normalized.encode("ascii", "ignore").decode("ascii")
     cleaned = "".join(char for char in ascii_word if char.isalpha())
     if len(cleaned) < 4:
-        raise ValueError("Palavra remota invalida.")
+        raise ValueError("Palavra remota inválida.")
     return cleaned
 
 
@@ -172,7 +172,7 @@ def _hangman_runtime() -> RuntimeEnvelope:
     try:
         data = _fetch_json("https://random-word-api.herokuapp.com/word?lang=pt-br&number=1")
         if not isinstance(data, list) or not data:
-            raise ValueError("Resposta invalida.")
+            raise ValueError("Resposta inválida.")
         word = _normalize_word(str(data[0]))
         source = "remote_api"
     except Exception:
@@ -267,7 +267,7 @@ def _quiz_math_runtime() -> RuntimeEnvelope:
         data = _fetch_json(f"https://opentdb.com/api.php?{query}")
         results = _normalize_math_quiz_results(list(data.get("results") or []))
         if len(results) < 3:
-            raise ValueError("Poucas perguntas validas.")
+            raise ValueError("Poucas perguntas válidas.")
         source = "remote_api"
     except Exception:
         results = MATH_QUIZ_FALLBACK
@@ -326,7 +326,7 @@ def _maze_runtime() -> RuntimeEnvelope:
             f"https://guillaumeroux.fr/maze/?rows={rows}&cols={cols}&json"
         )
         if not isinstance(data, list):
-            raise ValueError("Resposta invalida de labirinto.")
+            raise ValueError("Resposta inválida de labirinto.")
         raw_grid = [[int(cell) for cell in row] for row in data]
         source = "remote_api"
     except Exception:
@@ -364,7 +364,7 @@ def build_game_runtime(game) -> dict:
     elif game.slug == "labirinto":
         runtime = _maze_runtime()
     else:
-        raise ValueError("Jogo nao suportado.")
+        raise ValueError("Jogo não suportado.")
 
     return {
         "gameId": str(game.id),

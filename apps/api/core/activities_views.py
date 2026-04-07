@@ -33,7 +33,7 @@ def _parse_due_at(raw_value):
         return None
     parsed = parse_datetime(str(raw_value))
     if parsed is None:
-        raise ValueError("Prazo invalido.")
+        raise ValueError("Prazo inválido.")
     if timezone.is_naive(parsed):
         parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
     return parsed
@@ -43,15 +43,15 @@ def _normalize_options(raw_options) -> list[dict[str, Any]]:
     if raw_options is None:
         return []
     if not isinstance(raw_options, list):
-        raise ValueError("As opcoes da questao devem ser uma lista.")
+        raise ValueError("As opções da questão devem ser uma lista.")
     normalized = []
     for idx, option in enumerate(raw_options):
         if not isinstance(option, dict):
-            raise ValueError("Cada opcao deve ser um objeto.")
+            raise ValueError("Cada opção deve ser um objeto.")
         try:
             position = int(option.get("position") or idx + 1)
         except (TypeError, ValueError) as exc:
-            raise ValueError("A posicao da opcao deve ser numerica.") from exc
+            raise ValueError("A posição da opção deve ser numérica.") from exc
         normalized.append(
             {
                 "label": str(option.get("label") or "").strip(),
@@ -66,16 +66,16 @@ def _normalize_questions(raw_questions) -> list[dict[str, Any]]:
     if raw_questions is None:
         return []
     if not isinstance(raw_questions, list):
-        raise ValueError("As questoes devem ser enviadas em lista.")
+        raise ValueError("As questões devem ser enviadas em lista.")
     normalized = []
     for idx, question in enumerate(raw_questions):
         if not isinstance(question, dict):
-            raise ValueError("Cada questao deve ser um objeto.")
+            raise ValueError("Cada questão deve ser um objeto.")
         try:
             weight = int(question.get("weight") or 0)
             position = int(question.get("position") or idx + 1)
         except (TypeError, ValueError) as exc:
-            raise ValueError("Peso e posicao da questao devem ser numericos.") from exc
+            raise ValueError("Peso e posição da questão devem ser numéricos.") from exc
         normalized.append(
             {
                 "statement": str(question.get("statement") or "").strip(),
@@ -157,14 +157,14 @@ def _save_questions(activity: Activity, questions: list[dict[str, Any]]) -> None
 def _upsert_activity(request, *, activity: Activity | None = None):
     if not _is_professor(request.user):
         return _error(
-            "Apenas professores podem gerir atividades.",
+            "Apenas professores podem gerir tarefas.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
 
     if activity is not None and activity.created_by_id != request.user.id:
         return _error(
-            "Atividade nao encontrada.",
+            "Tarefa não encontrada.",
             code="not_found",
             http_status=status.HTTP_404_NOT_FOUND,
         )
@@ -188,7 +188,7 @@ def _upsert_activity(request, *, activity: Activity | None = None):
             )
         )
     except (TypeError, ValueError):
-        return _error("A pontuacao total deve ser numerica.")
+        return _error("A pontuação total deve ser numérica.")
 
     try:
         due_at = _parse_due_at(data.get("dueAt", data.get("due_at", activity.due_at if activity else None)))
@@ -226,27 +226,27 @@ def _upsert_activity(request, *, activity: Activity | None = None):
         return _error(str(exc))
 
     if not title:
-        return _error("Titulo e obrigatorio.")
+        return _error("Título é obrigatório.")
     if kind not in Activity.Kind.values:
-        return _error("Tipo de atividade invalido.")
+        return _error("Formato interno da tarefa inválido.")
     if total_score != 100:
-        return _error("A pontuacao total do item deve ser 100.")
+        return _error("A pontuação total do item deve ser 100.")
     if kind == Activity.Kind.TRABALHO and questions:
-        return _error("Trabalhos nao aceitam questoes nesta fase inicial.")
+        return _error("Tarefas com anexo não aceitam questões nesta fase inicial.")
     if kind in {Activity.Kind.PROVA, Activity.Kind.ATIVIDADE} and len(questions) > 100:
-        return _error("Provas e atividades aceitam no maximo 100 questoes.")
+        return _error("Tarefas com questões aceitam no máximo 100 questões.")
 
     for question in questions:
         if not question["statement"]:
-            return _error("Toda questao precisa de enunciado.")
+            return _error("Toda questão precisa de enunciado.")
         if question["type"] not in Question.Type.values:
-            return _error("Tipo de questao invalido.")
+            return _error("Tipo de questão inválido.")
         if question["type"] == Question.Type.MULTIPLA_ESCOLHA and len(question["options"]) < 2:
-            return _error("Questao de multipla escolha precisa de ao menos 2 opcoes.")
+            return _error("Questão de múltipla escolha precisa de ao menos 2 opções.")
         if question["type"] == Question.Type.MULTIPLA_ESCOLHA and len(question["options"]) > 5:
-            return _error("Questoes de multipla escolha aceitam no maximo 5 opcoes.")
+            return _error("Questões de múltipla escolha aceitam no máximo 5 opções.")
         if question["type"] == Question.Type.DISSERTATIVA and question["options"]:
-            return _error("Questao dissertativa nao aceita opcoes.")
+            return _error("Questão dissertativa não aceita opções.")
 
     with transaction.atomic():
         target = activity or Activity(created_by=request.user)
@@ -309,7 +309,7 @@ def activity_publish(request, activity_id: int):
     activity = _get_activity_for_request(request, activity_id)
     if not _is_professor(request.user):
         return _error(
-            "Apenas professores podem publicar atividades.",
+            "Apenas professores podem publicar tarefas.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
@@ -326,7 +326,7 @@ def activity_publish(request, activity_id: int):
         return Response(
             {
                 "code": "invalid_activity",
-                "message": "A atividade nao pode ser publicada ainda.",
+                "message": "A tarefa ainda não pode ser publicada.",
                 "validation": summary,
             },
             status=status.HTTP_400_BAD_REQUEST,
@@ -348,27 +348,27 @@ def activity_questions_collection(request, activity_id: int):
     activity = _get_activity_for_request(request, activity_id)
     if not _is_professor(request.user):
         return _error(
-            "Apenas professores podem editar questoes.",
+            "Apenas professores podem editar questões.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
     if activity.status != Activity.Status.DRAFT:
-        return _error("Questoes so podem ser alteradas em draft.")
+        return _error("Questões só podem ser alteradas em draft.")
     if activity.kind == Activity.Kind.TRABALHO:
-        return _error("Trabalhos nao aceitam questoes nesta fase inicial.")
+        return _error("Tarefas com anexo não aceitam questões nesta fase inicial.")
 
     try:
         questions = _normalize_questions([request.data])
     except ValueError as exc:
         return _error(str(exc))
     if not questions:
-        return _error("Questao invalida.")
+        return _error("Questão inválida.")
     if activity.questions.count() >= 100:
-        return _error("Provas e atividades aceitam no maximo 100 questoes.")
+        return _error("Tarefas com questões aceitam no máximo 100 questões.")
 
     payload = questions[0]
     if payload["type"] == Question.Type.MULTIPLA_ESCOLHA and len(payload["options"]) > 5:
-        return _error("Questoes de multipla escolha aceitam no maximo 5 opcoes.")
+        return _error("Questões de múltipla escolha aceitam no máximo 5 opções.")
     validation = _validation_summary_from_payload(
         kind=activity.kind,
         description=activity.description,
@@ -423,12 +423,12 @@ def question_item(request, question_id: int):
     activity = question.activity
     if not _is_professor(request.user) or activity.created_by_id != request.user.id:
         return _error(
-            "Questao nao encontrada.",
+            "Questão não encontrada.",
             code="not_found",
             http_status=status.HTTP_404_NOT_FOUND,
         )
     if activity.status != Activity.Status.DRAFT:
-        return _error("Questoes so podem ser alteradas em draft.")
+        return _error("Questões só podem ser alteradas em draft.")
 
     raw_payload = {
         "statement": request.data.get("statement", question.statement),
@@ -454,11 +454,11 @@ def question_item(request, question_id: int):
     except ValueError as exc:
         return _error(str(exc))
     if normalized["type"] == Question.Type.MULTIPLA_ESCOLHA and len(normalized["options"]) < 2:
-        return _error("Questao de multipla escolha precisa de ao menos 2 opcoes.")
+        return _error("Questão de múltipla escolha precisa de ao menos 2 opções.")
     if normalized["type"] == Question.Type.MULTIPLA_ESCOLHA and len(normalized["options"]) > 5:
-        return _error("Questoes de multipla escolha aceitam no maximo 5 opcoes.")
+        return _error("Questões de múltipla escolha aceitam no máximo 5 opções.")
     if normalized["type"] == Question.Type.DISSERTATIVA and normalized["options"]:
-        return _error("Questao dissertativa nao aceita opcoes.")
+        return _error("Questão dissertativa não aceita opções.")
 
     question.statement = normalized["statement"]
     question.type = normalized["type"]

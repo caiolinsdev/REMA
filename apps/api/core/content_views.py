@@ -33,7 +33,7 @@ def contents_collection(request):
 
     if not _is_professor(request.user):
         return _error(
-            "Apenas professores podem criar conteudos.",
+            "Apenas professores podem criar conteúdos.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
@@ -54,7 +54,7 @@ def contents_collection(request):
         return _error(str(exc))
 
     if not title or not subtitle or not description:
-        return _error("Titulo, subtitulo e descricao sao obrigatorios.")
+        return _error("Título, subtítulo e descrição são obrigatórios.")
 
     content = Content.objects.create(
         title=title,
@@ -82,7 +82,7 @@ def content_item(request, content_id: int):
 
     if not _is_professor(request.user):
         return _error(
-            "Apenas professores podem alterar conteudos.",
+            "Apenas professores podem alterar conteúdos.",
             code="forbidden_role",
             http_status=status.HTTP_403_FORBIDDEN,
         )
@@ -108,9 +108,9 @@ def content_item(request, content_id: int):
     requested_status = request.data.get("status", content.status)
 
     if not title or not subtitle or not description:
-        return _error("Titulo, subtitulo e descricao sao obrigatorios.")
+        return _error("Título, subtítulo e descrição são obrigatórios.")
     if requested_status not in Content.Status.values:
-        return _error("Status de conteudo invalido.")
+        return _error("Status de conteúdo inválido.")
 
     content.title = title
     content.subtitle = subtitle

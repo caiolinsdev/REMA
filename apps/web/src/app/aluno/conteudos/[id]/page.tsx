@@ -22,11 +22,11 @@ export default function Page() {
     }
     apiContentDetail(token, params.id)
       .then(setContent)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteudo"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteúdo"));
   }, [params.id, router]);
 
   if (!content) {
-    return <p style={{ color: "#64748b" }}>{error ?? "Carregando conteudo…"}</p>;
+    return <p style={{ color: "#64748b" }}>{error ?? "Carregando conteúdo..."}</p>;
   }
 
   return (

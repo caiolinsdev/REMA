@@ -34,7 +34,7 @@ export function LoginScreen() {
       <Text style={styles.badge}>REMA</Text>
       <Text style={styles.title}>Entrar</Text>
       <Text style={styles.hint}>
-        Demo: aluno@demo.local ou professor@demo.local — senha demo123 (apos seed na API).
+        Demo: aluno@demo.local ou professor@demo.local - senha demo123 (após seed na API).
       </Text>
       <TextInput
         style={styles.input}

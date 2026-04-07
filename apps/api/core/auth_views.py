@@ -33,7 +33,7 @@ def auth_login(request):
         return Response(
             {
                 "code": "invalid_body",
-                "message": "Campos email e password sao obrigatorios.",
+                "message": "Campos email e password são obrigatórios.",
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
@@ -42,13 +42,13 @@ def auth_login(request):
         return Response(
             {
                 "code": "invalid_credentials",
-                "message": "Email ou senha invalidos.",
+                "message": "Email ou senha inválidos.",
             },
             status=status.HTTP_401_UNAUTHORIZED,
         )
     if not UserProfile.objects.filter(user=user).exists():
         return Response(
-            {"code": "no_profile", "message": "Usuario sem perfil configurado."},
+            {"code": "no_profile", "message": "Usuário sem perfil configurado."},
             status=status.HTTP_403_FORBIDDEN,
         )
     session = AuthSession.objects.create(user=user)

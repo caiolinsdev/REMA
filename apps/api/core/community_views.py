@@ -83,14 +83,14 @@ def community_posts_collection(request):
         return _error(str(exc))
 
     if audience not in CommunityPost.Audience.values:
-        return _error("Audience invalida.")
+        return _error("Audience inválida.")
     if not title or not body:
-        return _error("Titulo e corpo sao obrigatorios.")
+        return _error("Título e corpo são obrigatórios.")
 
     if _is_student(request.user):
         if audience != CommunityPost.Audience.ALUNOS:
             return _error(
-                "Aluno so pode publicar na comunidade de alunos.",
+                "Aluno só pode publicar na comunidade de alunos.",
                 code="forbidden_role",
                 http_status=status.HTTP_403_FORBIDDEN,
             )

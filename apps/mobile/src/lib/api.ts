@@ -32,7 +32,7 @@ export async function apiMe(token: string): Promise<MeResponse> {
   }
   const data = (await res.json().catch(() => ({}))) as { message?: string };
   if (!res.ok) {
-    throw new Error(data.message ?? "Falha ao carregar sessao");
+    throw new Error(data.message ?? "Falha ao carregar sessão");
   }
   return data as MeResponse;
 }

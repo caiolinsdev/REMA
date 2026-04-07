@@ -25,7 +25,7 @@ export default function Page() {
     if (!token) return;
     apiCalendarEvents(token)
       .then(setEvents)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar calendario"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar calendário"));
   }, []);
 
   async function onSubmit(event: React.FormEvent) {
@@ -53,18 +53,18 @@ export default function Page() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
-        <h1 style={{ marginTop: 0 }}>Calendario</h1>
+        <h1 style={{ marginTop: 0 }}>Calendário</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          Eventos manuais do professor e prazos academicos das atividades criadas.
+          Eventos manuais do professor e prazos acadêmicos das tarefas criadas.
         </p>
       </div>
 
       {error ? <div style={{ color: "#b91c1c" }}>{error}</div> : null}
 
       <form onSubmit={onSubmit} style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 12 }}>
-        <h2 style={{ margin: 0 }}>Novo evento academico</h2>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titulo" required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descricao" rows={3} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
+        <h2 style={{ margin: 0 }}>Novo evento acadêmico</h2>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título" required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição" rows={3} style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", resize: "vertical" }} />
         <input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
         <button type="submit" style={{ width: "fit-content", borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}>
           Criar evento

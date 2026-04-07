@@ -1,4 +1,4 @@
-# Modulos do Professor
+# Módulos do Professor
 
 ## Objetivo
 
@@ -20,53 +20,52 @@ Ser a central operacional do professor autenticado.
 ### Blocos provaveis
 
 - atividades recentes
-- conteudos criados ou pendentes
-- agenda academica
+- conteúdos criados ou pendentes
+- agenda acadêmica
 - atalhos para comunidade e perfil
 
-## Provas / Atividades / Trabalhos
+## Tarefas
 
 ### Papel da view
 
-Centralizar criacao, publicacao e acompanhamento de atividades.
+Centralizar criação, publicação e acompanhamento de tarefas.
 
 ### Capacidades esperadas
 
 - listar atividades
-- criar nova atividade
-- editar configuracoes
+- criar nova tarefa
+- editar configurações
 - publicar
 - acompanhar status
 - ver envios dos alunos
 - atribuir nota e retorno
-- criar questoes e configurar pontuacao
+- criar questões e configurar pontuação
 
 ### Regras conhecidas
 
-- `Prova` e `Atividade` sao conjuntos de questoes
-- O limite e de `100` questoes por prova ou atividade
-- `Provas`, `Atividades` e `Trabalhos` possuem pontuacao maxima de `100`
-- Quando houver valor por questao, a soma precisa resultar em `100`
-- Cada questao pode ser:
+- Internamente, `prova` e `atividade` são conjuntos de questões
+- O limite é de `100` questões por tarefa com questões
+- As tarefas possuem pontuação máxima de `100`
+- Quando houver valor por questão, a soma precisa resultar em `100`
+- Cada questão pode ser:
   - `dissertativa`
   - `multipla escolha` com ate `5` opcoes
-- A questao pode conter imagem para interpretacao
-- Toda questao pode ter explicacao esperada ou gabarito nao visivel ao aluno
-- `Trabalho` exige comentario obrigatorio do professor ao validar
+- A questão pode conter imagem para interpretação
+- Toda questão pode ter explicação esperada ou gabarito não visível ao aluno
+- Tarefa com anexo exige comentário obrigatório do professor ao validar
 
 ### Capacidades esperadas na pratica
 
-- criar prova
-- criar atividade
-- criar trabalho com descricao livre
+- criar tarefa com questões
+- criar tarefa com anexo
 - definir valor total
 - cadastrar questoes
 - acompanhar envio do aluno
 - corrigir quando aplicavel
 - registrar nota
-- registrar comentario obrigatorio em trabalhos
+- registrar comentário obrigatório em tarefas com anexo
 
-## Conteudos
+## Conteúdos
 
 ### Papel da view
 
@@ -74,25 +73,25 @@ Gerenciar materiais pedagogicos.
 
 ### Capacidades esperadas
 
-- criar conteudo
-- editar conteudo
-- excluir conteudo
+- criar conteúdo
+- editar conteúdo
+- excluir conteúdo
 - publicar
 - organizar por grupos logicos
-- definir titulo, subtitulo, descricao, imagem ou video
+- definir título, subtítulo, descrição, imagem ou vídeo
 
-## Calendario
+## Calendário
 
 ### Papel da view
 
-Oferecer visao temporal dos compromissos academicos.
+Oferecer visão temporal dos compromissos acadêmicos.
 
 ### Capacidades esperadas
 
 - ver agenda
 - abrir evento
 - criar ou atualizar evento, se for parte do papel do professor
-- acompanhar impactos automaticos de datas de entrega no calendario
+- acompanhar impactos automáticos de datas de entrega no calendário
 
 ## Comunidade
 
@@ -125,8 +124,8 @@ Gerenciar identidade profissional e preferencias.
 ## Ordem Recomendada de Aprofundamento
 
 1. `Home`
-2. `Provas / atividades / trabalhos`
-3. `Conteudos`
-4. `Calendario`
+2. `Tarefas`
+3. `Conteúdos`
+4. `Calendário`
 5. `Perfil`
 6. `Comunidade`

@@ -10,7 +10,7 @@ import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
 
 function formatPublished(value: string) {
-  if (!value) return "Nao publicado";
+  if (!value) return "Não publicado";
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
@@ -32,7 +32,7 @@ export default function Page() {
     }
     apiContentDetail(token, params.id)
       .then(setContent)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteudo"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar conteúdo"));
   }, [params.id, router]);
 
   async function updateStatus(status: "published" | "draft" | "archived") {
@@ -43,7 +43,7 @@ export default function Page() {
     try {
       setContent(await apiUpdateContent(token, content.id, { status }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao atualizar conteudo");
+      setError(err instanceof Error ? err.message : "Falha ao atualizar conteúdo");
     } finally {
       setLoadingAction(false);
     }
@@ -52,19 +52,19 @@ export default function Page() {
   async function handleDelete() {
     const token = getStoredToken();
     if (!token || !content) return;
-    if (!window.confirm("Deseja excluir este conteudo?")) return;
+    if (!window.confirm("Deseja excluir este conteúdo?")) return;
     setLoadingAction(true);
     try {
       await apiDeleteContent(token, content.id);
       router.push("/professor/conteudos");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao excluir conteudo");
+      setError(err instanceof Error ? err.message : "Falha ao excluir conteúdo");
       setLoadingAction(false);
     }
   }
 
   if (!content) {
-    return <p style={{ color: "#64748b" }}>{error ?? "Carregando conteudo…"}</p>;
+    return <p style={{ color: "#64748b" }}>{error ?? "Carregando conteúdo..."}</p>;
   }
 
   return (

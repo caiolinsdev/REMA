@@ -8,6 +8,12 @@ import type { ActivityDetail, SubmissionListItem } from "@rema/contracts";
 import { apiActivityDetail, apiActivitySubmissions, apiPublishActivity } from "@/lib/api";
 import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
+import {
+  activityKindBehaviorLabel,
+  activityStatusLabel,
+  questionTypeLabel,
+  submissionStatusLabel,
+} from "@/modules/activities/ui";
 
 function formatDate(value: string | null) {
   if (!value) return "Sem prazo";
@@ -36,7 +42,7 @@ export default function Page({
     }
     apiActivityDetail(token, activityId)
       .then(setActivity)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar atividade"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar tarefa"));
     apiActivitySubmissions(token, activityId)
       .then(setSubmissions)
       .catch(() => {});
@@ -55,14 +61,14 @@ export default function Page({
       const updated = await apiPublishActivity(token, activityId);
       setActivity(updated);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao publicar atividade");
+      setError(err instanceof Error ? err.message : "Falha ao publicar tarefa");
     } finally {
       setPublishing(false);
     }
   }
 
   if (!activity) {
-    return <p style={{ color: "#64748b" }}>{error ?? "Carregando atividade…"}</p>;
+    return <p style={{ color: "#64748b" }}>{error ?? "Carregando tarefa..."}</p>;
   }
 
   return (
@@ -71,7 +77,7 @@ export default function Page({
         <div>
           <h1 style={{ marginTop: 0 }}>{activity.title}</h1>
           <p style={{ margin: "8px 0 0", color: "#64748b" }}>
-            {activity.kind} · {activity.status} · prazo {formatDate(activity.dueAt)} · total {activity.totalScore}
+            {activityKindBehaviorLabel(activity.kind)} · {activityStatusLabel(activity.status)} · prazo {formatDate(activity.dueAt)} · total {activity.totalScore}
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -99,14 +105,14 @@ export default function Page({
       {error ? <div style={{ color: "#b91c1c" }}>{error}</div> : null}
 
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Descricao</h2>
+        <h2 style={{ marginTop: 0 }}>Descrição</h2>
         <p style={{ marginBottom: 0, color: "#334155", lineHeight: 1.7 }}>
-          {activity.description || "Sem descricao."}
+          {activity.description || "Sem descrição."}
         </p>
       </section>
 
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Validacao</h2>
+        <h2 style={{ marginTop: 0 }}>Validação</h2>
         {activity.validation?.issues.length ? (
           <ul style={{ marginBottom: 0 }}>
             {activity.validation.issues.map((issue) => (
@@ -122,15 +128,15 @@ export default function Page({
         <section style={{ display: "grid", gap: 16 }}>
           {activity.questions?.map((question) => (
             <article key={question.id} style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-              <h3 style={{ marginTop: 0 }}>Questao {question.position}</h3>
+              <h3 style={{ marginTop: 0 }}>Questão {question.position}</h3>
               <p style={{ color: "#334155", lineHeight: 1.7 }}>{question.statement}</p>
               <p style={{ color: "#64748b" }}>
-                {question.type} · peso {question.weight}
+                {questionTypeLabel(question.type)} · peso {question.weight}
               </p>
               {question.supportImageUrl ? (
                 <MediaImage
                   src={question.supportImageUrl}
-                  alt={`Imagem de apoio da questao ${question.position}`}
+                  alt={`Imagem de apoio da questão ${question.position}`}
                   style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }}
                 />
               ) : null}
@@ -144,21 +150,21 @@ export default function Page({
                 </ul>
               ) : null}
               <p style={{ marginBottom: 0, color: "#475569" }}>
-                <strong>Gabarito esperado:</strong> {question.expectedAnswer || "Nao informado."}
+                <strong>Gabarito esperado:</strong> {question.expectedAnswer || "Não informado."}
               </p>
             </article>
           ))}
           {activity.questions?.length === 0 ? (
             <div style={{ background: "#fff", border: "1px dashed #cbd5e1", borderRadius: 16, padding: 20, color: "#64748b" }}>
-              Nenhuma questao cadastrada ainda.
+              Nenhuma questão cadastrada ainda.
             </div>
           ) : null}
         </section>
       ) : (
         <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-          <h2 style={{ marginTop: 0 }}>Entrega tipo trabalho</h2>
+          <h2 style={{ marginTop: 0 }}>Entrega com anexo</h2>
           <p style={{ marginBottom: 0, color: "#64748b" }}>
-            Este item usa descricao e prazo, sem estrutura de questoes nesta fase.
+            Esta tarefa usa descrição e prazo, sem estrutura de questões nesta fase.
           </p>
         </section>
       )}
@@ -173,7 +179,7 @@ export default function Page({
                   <div>
                     <strong>{submission.studentName}</strong>
                     <p style={{ margin: "6px 0 0", color: "#64748b" }}>
-                      {submission.status}
+                      {submissionStatusLabel(submission.status)}
                       {submission.submittedAt ? ` · enviado em ${formatDate(submission.submittedAt)}` : ""}
                       {typeof submission.score === "number" ? ` · nota ${submission.score}` : ""}
                     </p>

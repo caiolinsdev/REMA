@@ -42,30 +42,29 @@ Possiveis endpoints:
 - `GET /api/student/home/`
 - `GET /api/teacher/home/`
 
-### Provas / Atividades
+### Tarefas
 
 Capacidades para aluno:
 
-- listar atividades
+- listar tarefas
 - ver detalhes
 - acompanhar status
 - entregar resposta
-- anexar arquivo quando for trabalho
+- anexar arquivo quando a tarefa exigir anexo
 - consultar nota e retorno
 
 Capacidades para professor:
 
-- listar atividades criadas
-- criar atividade
-- criar prova
-- criar trabalho
-- editar atividade
-- publicar atividade
+- listar tarefas criadas
+- criar tarefa
+- configurar o comportamento interno da tarefa
+- editar tarefa
+- publicar tarefa
 - acompanhar entregas
 - corrigir envios
 - registrar nota e comentario
-- validar soma de pontuacao
-- cadastrar questoes
+- validar soma de pontuação
+- cadastrar questões
 
 Possiveis endpoints:
 
@@ -83,29 +82,29 @@ Possiveis endpoints:
 
 Regras conhecidas para contrato:
 
-- `Activity.kind` deve aceitar `prova`, `atividade` e `trabalho`
-- `prova` e `atividade` podem ter ate `100` questoes
+- `Activity.kind` deve aceitar internamente `prova`, `atividade` e `trabalho`
+- `prova` e `atividade` podem ter até `100` questões
 - `total_score` do item deve ser `100`
 - a soma de `Question.weight` deve ser `100`
-- questoes podem ser `dissertativas` ou `multipla_escolha`
-- questoes de multipla escolha aceitam ate `5` opcoes
+- questões podem ser `dissertativas` ou `multipla_escolha`
+- questões de multipla escolha aceitam até `5` opções
 - `trabalho` aceita anexo `pdf`, `doc`, `docx` ou `txt`
 - o envio do aluno e unico
-- em `trabalho`, o comentario do professor e obrigatorio na avaliacao
+- em `trabalho`, o comentário do professor é obrigatório na avaliação
 
-### Conteudos
+### Conteúdos
 
 Capacidades para aluno:
 
-- listar conteudos
+- listar conteúdos
 - ver detalhes
 
 Capacidades para professor:
 
-- criar conteudo
-- editar conteudo
-- excluir conteudo
-- publicar conteudo
+- criar conteúdo
+- editar conteúdo
+- excluir conteúdo
+- publicar conteúdo
 
 Possiveis endpoints:
 
@@ -121,7 +120,7 @@ Regras conhecidas para contrato:
   `author`
 - campos opcionais: `image_url`, `video_url`
 
-### Calendario
+### Calendário
 
 Capacidades:
 
@@ -129,8 +128,8 @@ Capacidades:
 - ver detalhe
 - criar evento, se permitido
 - atualizar evento, se permitido
-- incluir automaticamente prazos academicos
-- gerenciar anotacoes pessoais do aluno
+- incluir automaticamente prazos acadêmicos
+- gerenciar anotações pessoais do aluno
 
 Possiveis endpoints:
 
@@ -236,8 +235,8 @@ flowchart LR
   auth[UsuarioAutenticado] --> roleCheck{Role}
   roleCheck -->|aluno| alunoEndpoints[AlunoEndpoints]
   roleCheck -->|professor| professorEndpoints[ProfessorEndpoints]
-  alunoEndpoints --> sharedRead[Leitura de conteudos, calendario e perfil]
-  professorEndpoints --> managementWrite[Gestao de conteudos e atividades]
+  alunoEndpoints --> sharedRead[Leitura de conteúdos, calendário e perfil]
+  professorEndpoints --> managementWrite[Gestão de conteúdos e tarefas]
 ```
 
 ## Ordem Recomendada de API

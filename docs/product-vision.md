@@ -2,23 +2,23 @@
 
 ## Objetivo
 
-Documentar uma visao inicial do produto REMA a partir do fluxograma enviado,
-servindo como base para refinamentos futuros de negocio, UX e API.
+Documentar uma visão inicial do produto REMA a partir do fluxograma enviado,
+servindo como base para refinamentos futuros de negócio, UX e API.
 
 ## Proposta Inicial
 
-O REMA nasce como uma plataforma educacional com duas experiencias principais:
+O REMA nasce como uma plataforma educacional com duas experiências principais:
 
-- `Aluno`: consumir conteudos, acompanhar provas e atividades, organizar a
-  rotina, participar de comunidade e interagir com recursos ludicos.
-- `Professor`: publicar conteudos, criar atividades, acompanhar o calendario e
+- `Aluno`: consumir conteúdos, acompanhar tarefas, organizar a
+  rotina, participar da comunidade e interagir com recursos lúdicos.
+- `Professor`: publicar conteúdos, criar tarefas, acompanhar o calendário e
   interagir com uma comunidade profissional.
 
-O modulo academico passa a ter tres objetos pedagogicos principais:
+O módulo acadêmico passa a ter três objetos pedagógicos principais:
 
-- `Prova`: conjunto de questoes avaliativas
-- `Atividade`: conjunto de questoes avaliativas
-- `Trabalho`: atividade com descricao livre e envio de arquivo pelo aluno
+- `Tarefa com questões`: conjunto de questões avaliativas
+- `Tarefa com anexo`: atividade com descrição livre e envio de arquivo pelo aluno
+- Internamente, o domínio ainda mantém `prova`, `atividade` e `trabalho`
 
 ## Perfis Atendidos
 
@@ -32,7 +32,7 @@ experiencia adaptada ao seu papel.
 
 ### Para Aluno
 
-- Dificuldade para centralizar atividades, provas e materiais
+- Dificuldade para centralizar tarefas e materiais
 - Falta de visibilidade da rotina academica
 - Baixo engajamento em ambientes de estudo tradicionais
 
@@ -52,9 +52,9 @@ experiencia adaptada ao seu papel.
 
 - `Login`
 - `Home`
-- `Provas / atividades / trabalhos`
-- `Conteudos`
-- `Calendario`
+- `Tarefas`
+- `Conteúdos`
+- `Calendário`
 - `Comunidade`
 - `Perfil`
 - `Jogos` para aluno
@@ -63,32 +63,32 @@ experiencia adaptada ao seu papel.
 
 ### Avaliacoes
 
-- `Provas` e `Atividades` sao conjuntos de questoes
-- Cada `Prova` ou `Atividade` pode ter ate `100` questoes
-- A pontuacao total de `Provas`, `Atividades` e `Trabalhos` deve ser `100`
-- Quando houver pontuacao por questao, a soma das questoes deve ser
+- Tarefas com questões são conjuntos de questões
+- Cada tarefa com questões pode ter até `100` questões
+- A pontuação total das tarefas deve ser `100`
+- Quando houver pontuação por questão, a soma das questões deve ser
   obrigatoriamente `100`
-- Cada questao pode ser:
+- Cada questão pode ser:
   - `dissertativa`
-  - `multipla escolha` com ate `5` opcoes
-- A questao pode conter imagem para interpretacao
-- A questao possui explicacao esperada ou gabarito de apoio, nao visivel ao
-  aluno no momento da realizacao
+-  - `multipla escolha` com até `5` opções
+- A questão pode conter imagem para interpretação
+- A questão possui explicação esperada ou gabarito de apoio, não visível ao
+  aluno no momento da realização
 - O sistema precisa registrar status de envio do aluno
 
-### Trabalhos
+### Tarefas com anexo
 
-- `Trabalho` e tratado como um tipo de atividade
-- Deve conter descricao do que precisa ser feito
+- A tarefa com anexo é tratada como um tipo de atividade
+- Deve conter descrição do que precisa ser feito
 - O aluno envia um arquivo `PDF`, `Word` ou `TXT`
-- O professor devolve nota com comentario obrigatorio
+- O professor devolve nota com comentário obrigatório
 
-### Conteudos
+### Conteúdos
 
 - Campos obrigatorios:
   - `titulo`
   - `subtitulo`
-  - `descricao`
+  - `descrição`
   - `data de postagem`
   - `autor`
 - Campos opcionais:
@@ -105,10 +105,10 @@ experiencia adaptada ao seu papel.
 - `Professor` cria post visivel apenas para professores
 - `Professor` ve posts de professores e tambem os posts dos alunos para moderar
 
-### Calendario
+### Calendário
 
-- Deve conversar com datas de entrega de provas, atividades e trabalhos
-- Deve permitir anotacoes pessoais do aluno
+- Deve conversar com datas de entrega de tarefas
+- Deve permitir anotações pessoais do aluno
 
 ### Jogos
 
@@ -121,9 +121,9 @@ experiencia adaptada ao seu papel.
 
 - `Login`
 - `Home`
-- `Provas / atividades / trabalhos`
-- `Conteudos`
-- `Calendario`
+- `Tarefas`
+- `Conteúdos`
+- `Calendário`
 
 ### Suporte de conta e continuidade
 
@@ -136,11 +136,11 @@ experiencia adaptada ao seu papel.
 
 ## Leitura de Prioridade
 
-Os cinco modulos do nucleo devem ser tratados como o centro funcional do
-produto porque sustentam a rotina diaria de estudo e ensino. `Perfil` entra em
+Os cinco módulos do núcleo devem ser tratados como o centro funcional do
+produto porque sustentam a rotina diária de estudo e ensino. `Perfil` entra em
 seguida por ser complementar ao uso recorrente. `Comunidade` e `Jogos` devem
-ser mantidos flexiveis ate que a proposta pedagogica esteja mais clara, embora
-`Comunidade` ja tenha uma regra de moderacao importante desde o inicio.
+ser mantidos flexíveis até que a proposta pedagógica esteja mais clara, embora
+`Comunidade` já tenha uma regra de moderação importante desde o início.
 
 ## Navegacao Macro
 
@@ -152,7 +152,7 @@ flowchart LR
 
   alunoArea --> alunoCore[Home + Estudos + Agenda]
   alunoArea --> alunoEngagement[Jogos + Comunidade]
-  professorArea --> professorCore[Home + Conteudos + Atividades + Agenda]
+  professorArea --> professorCore[Home + Conteúdos + Tarefas + Agenda]
   professorArea --> professorCommunity[Comunidade + Perfil]
 ```
 
@@ -160,9 +160,8 @@ flowchart LR
 
 - O sistema inicia com dois papeis bem definidos
 - O acesso e autenticado
-- A maior parte do valor inicial vem de `provas`, `atividades`, `trabalhos`,
-  `conteudos` e `calendario`
-- `Jogos` pode entrar como piloto ou experimento, nao obrigatoriamente como
+- A maior parte do valor inicial vem de `tarefas`, `conteúdos` e `calendário`
+- `Jogos` pode entrar como piloto ou experimento, não obrigatoriamente como
   parte do primeiro ciclo funcional
 
 ## Riscos de Produto
@@ -170,5 +169,5 @@ flowchart LR
 - `Jogos` pode aumentar escopo cedo demais sem clareza pedagogica
 - `Comunidade` exige moderacao desde o primeiro dia por depender de aprovacao de
   posts de alunos
-- `Provas / atividades` pode se tornar complexo rapidamente se misturar
-  criacao, entrega, correcao, nota, comentarios e anexos sem recorte inicial
+- `Tarefas` pode se tornar complexo rapidamente se misturar
+  criação, entrega, correção, nota, comentários e anexos sem recorte inicial

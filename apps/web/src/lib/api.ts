@@ -80,7 +80,7 @@ async function authorizedRequest<T>(token: string, path: string, init?: RequestI
   });
   const data = await parseJson(res);
   if (!res.ok) {
-    const error = new Error(getErrorMessage(data, "Falha na requisicao")) as Error & {
+    const error = new Error(getErrorMessage(data, "Falha na requisição")) as Error & {
       status?: number;
     };
     error.status = res.status;
@@ -112,7 +112,7 @@ export async function apiMe(token: string): Promise<MeResponse> {
   }
   const data = await parseJson(res);
   if (!res.ok) {
-    throw new Error(getErrorMessage(data, "Falha ao carregar sessao"));
+    throw new Error(getErrorMessage(data, "Falha ao carregar sessão"));
   }
   return data as MeResponse;
 }

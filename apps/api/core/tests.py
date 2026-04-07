@@ -762,7 +762,7 @@ class GamesFlowTests(TestCase):
         )
         self.assertEqual(list_response.status_code, 200)
         self.assertEqual(len(list_response.json()), 1)
-        self.assertEqual(list_response.json()[0]["gameTitle"], "Quiz de Matematica")
+        self.assertEqual(list_response.json()[0]["gameTitle"], "Quiz de Matemática")
 
     def test_game_detail_includes_student_progress(self):
         GameSession.objects.create(

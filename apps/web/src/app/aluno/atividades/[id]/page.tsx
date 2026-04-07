@@ -12,6 +12,12 @@ import {
 } from "@/lib/api";
 import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
+import {
+  activityKindBehaviorLabel,
+  activityStatusLabel,
+  questionTypeLabel,
+  submissionStatusLabel,
+} from "@/modules/activities/ui";
 
 function formatDate(value: string | null) {
   if (!value) return "Sem prazo";
@@ -49,7 +55,7 @@ export default function Page() {
     }
     apiActivityDetail(token, params.id)
       .then(setActivity)
-      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar atividade"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar tarefa"));
     apiCurrentSubmission(token, params.id)
       .then(setSubmission)
       .catch((err) => {
@@ -164,7 +170,7 @@ export default function Page() {
       return;
     }
     const accepted = window.confirm(
-      "Depois de confirmar o envio, nao sera possivel editar ou reenviar. Deseja continuar?",
+      "Depois de confirmar o envio, não será possível editar ou reenviar. Deseja continuar?",
     );
     if (!accepted) return;
 
@@ -183,7 +189,7 @@ export default function Page() {
   }
 
   if (!activity) {
-    return <p style={{ color: "#64748b" }}>{error ?? "Carregando atividade…"}</p>;
+    return <p style={{ color: "#64748b" }}>{error ?? "Carregando tarefa..."}</p>;
   }
 
   return (
@@ -191,7 +197,7 @@ export default function Page() {
       <div>
         <h1 style={{ marginTop: 0 }}>{activity.title}</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          {activity.kind} · {activity.status} · prazo {formatDate(activity.dueAt)} · pontuacao total {activity.totalScore}
+          {activityKindBehaviorLabel(activity.kind)} · {activityStatusLabel(activity.status)} · prazo {formatDate(activity.dueAt)} · pontuação total {activity.totalScore}
         </p>
       </div>
 
@@ -199,7 +205,7 @@ export default function Page() {
         <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
           <h2 style={{ marginTop: 0 }}>Meu envio</h2>
           <p style={{ color: "#475569" }}>
-            Status: <strong>{submission.status}</strong>
+            Status: <strong>{submissionStatusLabel(submission.status)}</strong>
             {submission.submittedAt ? <> · enviado em {formatDate(submission.submittedAt)}</> : null}
             {typeof submission.score === "number" ? <> · nota {submission.score}</> : null}
           </p>
@@ -209,7 +215,7 @@ export default function Page() {
             </p>
           ) : submission.status === "submitted" ? (
             <p style={{ marginBottom: 0, color: "#64748b" }}>
-              Seu envio foi confirmado e aguarda correcao do professor.
+              Seu envio foi confirmado e aguarda correção do professor.
             </p>
           ) : null}
         </section>
@@ -222,33 +228,33 @@ export default function Page() {
       ) : null}
 
       <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Descricao</h2>
+        <h2 style={{ marginTop: 0 }}>Descrição</h2>
         <p style={{ marginBottom: 0, color: "#334155", lineHeight: 1.7 }}>
-          {activity.description || "Sem descricao."}
+          {activity.description || "Sem descrição."}
         </p>
       </section>
 
       {activity.kind !== "trabalho" ? (
         <section style={{ display: "grid", gap: 16 }}>
           <div style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-            <h2 style={{ marginTop: 0 }}>Resolucao</h2>
+            <h2 style={{ marginTop: 0 }}>Resolução</h2>
             <p style={{ color: "#64748b", marginBottom: 0 }}>
-              Navegue entre as questoes, salve em andamento e confirme quando tiver certeza.
+              Navegue entre as questões, salve em andamento e confirme quando tiver certeza.
               {completionSummary ? ` Respondidas: ${completionSummary.answered}/${completionSummary.total}.` : ""}
             </p>
           </div>
 
           {currentQuestion ? (
             <article style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20 }}>
-              <h3 style={{ marginTop: 0 }}>Questao {currentQuestion.position}</h3>
+              <h3 style={{ marginTop: 0 }}>Questão {currentQuestion.position}</h3>
               <p style={{ color: "#334155", lineHeight: 1.7 }}>{currentQuestion.statement}</p>
               <p style={{ color: "#64748b" }}>
-                {currentQuestion.type} · peso {currentQuestion.weight}
+                {questionTypeLabel(currentQuestion.type)} · peso {currentQuestion.weight}
               </p>
               {currentQuestion.supportImageUrl ? (
                 <MediaImage
                   src={currentQuestion.supportImageUrl}
-                  alt={`Imagem de apoio da questao ${currentQuestion.position}`}
+                  alt={`Imagem de apoio da questão ${currentQuestion.position}`}
                   style={{ width: "100%", maxWidth: 320, borderRadius: 12, border: "1px solid #dbe4f0" }}
                 />
               ) : null}
@@ -304,7 +310,7 @@ export default function Page() {
                   onClick={() => setActiveQuestionIndex((current) => Math.max(0, current - 1))}
                   style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
                 >
-                  Questao anterior
+                  Questão anterior
                 </button>
                 <button
                   type="button"
@@ -316,7 +322,7 @@ export default function Page() {
                   }
                   style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
                 >
-                  Proxima questao
+                  Próxima questão
                 </button>
               </div>
             </article>
@@ -338,16 +344,16 @@ export default function Page() {
                 disabled={saving || confirming}
                 style={{ borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}
               >
-                {confirming ? "Confirmando…" : "Confirmar envio unico"}
+                {confirming ? "Confirmando..." : "Confirmar envio único"}
               </button>
             </div>
           ) : null}
         </section>
       ) : (
         <section style={{ background: "#fff", border: "1px solid #dbe4f0", borderRadius: 16, padding: 20, display: "grid", gap: 16 }}>
-          <h2 style={{ marginTop: 0 }}>Entrega tipo trabalho</h2>
+          <h2 style={{ marginTop: 0 }}>Entrega com anexo</h2>
           <p style={{ marginBottom: 0, color: "#64748b" }}>
-            Anexe um unico arquivo em `pdf`, `doc`, `docx` ou `txt`, salve e confirme o envio final.
+            Anexe um único arquivo em `pdf`, `doc`, `docx` ou `txt`, salve e confirme o envio final.
           </p>
 
           {workFile ? (
@@ -374,7 +380,7 @@ export default function Page() {
                   disabled={saving || confirming}
                   style={{ borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}
                 >
-                  {confirming ? "Confirmando…" : "Confirmar envio unico"}
+                  {confirming ? "Confirmando..." : "Confirmar envio único"}
                 </button>
               </div>
             </>

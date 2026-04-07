@@ -1,4 +1,4 @@
-# Modulos do Aluno
+# Módulos do Aluno
 
 ## Objetivo
 
@@ -20,12 +20,12 @@ Ser a tela de entrada do aluno autenticado.
 ### Blocos provaveis
 
 - proximas atividades
-- provas proximas
-- conteudos recentes
+- tarefas próximas
+- conteúdos recentes
 - agenda curta
 - atalhos rapidos
 
-## Provas / Atividades / Trabalhos
+## Tarefas
 
 ### Papel da view
 
@@ -37,34 +37,34 @@ Centralizar o acompanhamento das entregas academicas.
 - abrir detalhes
 - exibir prazo
 - mostrar status
-- responder questoes quando for prova ou atividade
-- enviar arquivo quando for trabalho
-- ver nota e retorno apos avaliacao
+- responder questões quando a tarefa usar formulário
+- enviar arquivo quando a tarefa exigir anexo
+- ver nota e retorno após avaliação
 
 ### Regras conhecidas
 
-- `Prova` e `Atividade` sao conjuntos de questoes
-- `Trabalho` e uma atividade com descricao livre e upload de arquivo
-- O aluno envia apenas uma vez e nao pode editar depois do envio
-- Antes do envio deve existir confirmacao explicita
+- Internamente, `prova` e `atividade` são conjuntos de questões
+- Internamente, `trabalho` é uma atividade com descrição livre e upload de arquivo
+- O aluno envia apenas uma vez e não pode editar depois do envio
+- Antes do envio deve existir confirmação explícita
 - A mesma view pode ser reaproveitada para realizacao e consulta de nota
-- As questoes podem ser:
+- As questões podem ser:
   - `dissertativas`
   - `multipla escolha` com ate `5` opcoes
-- A questao pode conter imagem
-- O aluno nao ve explicacao esperada ou gabarito durante a realizacao
+- A questão pode conter imagem
+- O aluno não vê explicação esperada ou gabarito durante a realização
 
 ### Capacidades esperadas na pratica
 
-- ver lista unificada de provas, atividades e trabalhos
-- distinguir tipo do item
+- ver lista unificada de tarefas
+- distinguir o comportamento da tarefa
 - preencher respostas
-- anexar `PDF`, `Word` ou `TXT` em trabalhos
-- receber mensagem de confirmacao antes de enviar
+- anexar `PDF`, `Word` ou `TXT` em tarefas com anexo
+- receber mensagem de confirmação antes de enviar
 - consultar status de envio
 - consultar nota e comentario quando disponiveis
 
-## Conteudos
+## Conteúdos
 
 ### Papel da view
 
@@ -72,14 +72,14 @@ Reunir os materiais que apoiam o estudo do aluno.
 
 ### Capacidades esperadas
 
-- listar conteudos
+- listar conteúdos
 - filtrar por categoria, tema ou disciplina
 - abrir detalhe
 - consumir material
-- visualizar titulo, subtitulo, descricao, autor e data de postagem
+- visualizar título, subtítulo, descrição, autor e data de postagem
 - consumir imagem ou video quando houver
 
-## Calendario
+## Calendário
 
 ### Papel da view
 
@@ -90,8 +90,8 @@ Dar visibilidade temporal a rotina do aluno.
 - ver eventos e prazos
 - navegar por periodo
 - abrir detalhe do compromisso
-- visualizar automaticamente prazos de provas, atividades e trabalhos
-- criar anotacoes pessoais individuais
+- visualizar automaticamente prazos de tarefas
+- criar anotações pessoais individuais
 
 ## Jogos
 
@@ -147,9 +147,9 @@ Dar ao aluno um espaco de identidade e configuracao.
 ## Ordem Recomendada de Aprofundamento
 
 1. `Home`
-2. `Provas / atividades / trabalhos`
-3. `Conteudos`
-4. `Calendario`
+2. `Tarefas`
+3. `Conteúdos`
+4. `Calendário`
 5. `Perfil`
 6. `Comunidade`
 7. `Jogos`

@@ -15,13 +15,13 @@ class AuthSessionAuthentication(authentication.BaseAuthentication):
         if header[0].decode().lower() != self.keyword.lower():
             return None
         if len(header) != 2:
-            raise exceptions.AuthenticationFailed("Token invalido.")
+            raise exceptions.AuthenticationFailed("Token inválido.")
 
         session_key = header[1].decode()
         try:
             session = AuthSession.objects.select_related("user").get(key=session_key)
         except AuthSession.DoesNotExist as exc:
-            raise exceptions.AuthenticationFailed("Sessao invalida ou expirada.") from exc
+            raise exceptions.AuthenticationFailed("Sessão inválida ou expirada.") from exc
 
         session.touch()
         return (session.user, session)

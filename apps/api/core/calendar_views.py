@@ -30,7 +30,7 @@ def _parse_dt(raw_value, label: str):
         return None
     parsed = parse_datetime(str(raw_value))
     if parsed is None:
-        raise ValueError(f"{label} invalido.")
+        raise ValueError(f"{label} inválido.")
     if timezone.is_naive(parsed):
         parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
     return parsed
@@ -85,15 +85,15 @@ def calendar_events_collection(request):
     description = str(request.data.get("description") or "").strip()
     event_type = str(request.data.get("type") or "").strip()
     try:
-        start_at = _parse_dt(request.data.get("startAt") or request.data.get("start_at"), "Inicio")
+        start_at = _parse_dt(request.data.get("startAt") or request.data.get("start_at"), "Início")
         end_at = _parse_dt(request.data.get("endAt") or request.data.get("end_at"), "Fim")
     except ValueError as exc:
         return _error(str(exc))
 
     if not title or not start_at:
-        return _error("Titulo e inicio sao obrigatorios.")
+        return _error("Título e início são obrigatórios.")
     if event_type not in CalendarEvent.Type.values:
-        return _error("Tipo de evento invalido.")
+        return _error("Tipo de evento inválido.")
 
     event = CalendarEvent.objects.create(
         title=title,
@@ -116,13 +116,13 @@ def calendar_event_item(request, event_id: int):
 
     if not _is_professor(request.user) or event.created_by_id != request.user.id:
         return _error(
-            "Evento nao encontrado.",
+            "Evento não encontrado.",
             code="not_found",
             http_status=status.HTTP_404_NOT_FOUND,
         )
 
     try:
-        start_at = _parse_dt(request.data.get("startAt", event.start_at), "Inicio")
+        start_at = _parse_dt(request.data.get("startAt", event.start_at), "Início")
         end_at = _parse_dt(request.data.get("endAt", event.end_at), "Fim")
     except ValueError as exc:
         return _error(str(exc))
@@ -131,9 +131,9 @@ def calendar_event_item(request, event_id: int):
     description = str(request.data.get("description", event.description) or "").strip()
     event_type = str(request.data.get("type", event.type) or "").strip()
     if not title or not start_at:
-        return _error("Titulo e inicio sao obrigatorios.")
+        return _error("Título e início são obrigatórios.")
     if event_type not in CalendarEvent.Type.values:
-        return _error("Tipo de evento invalido.")
+        return _error("Tipo de evento inválido.")
 
     event.title = title
     event.description = description
@@ -161,12 +161,12 @@ def calendar_notes_collection(request):
     title = str(request.data.get("title") or "").strip()
     description = str(request.data.get("description") or "").strip()
     try:
-        start_at = _parse_dt(request.data.get("startAt") or request.data.get("start_at"), "Inicio")
+        start_at = _parse_dt(request.data.get("startAt") or request.data.get("start_at"), "Início")
         end_at = _parse_dt(request.data.get("endAt") or request.data.get("end_at"), "Fim")
     except ValueError as exc:
         return _error(str(exc))
     if not title or not description or not start_at:
-        return _error("Titulo, descricao e inicio sao obrigatorios.")
+        return _error("Título, descrição e início são obrigatórios.")
 
     note = PersonalCalendarNote.objects.create(
         student=request.user,
@@ -190,7 +190,7 @@ def calendar_note_item(request, note_id: int):
 
     note = get_object_or_404(PersonalCalendarNote, pk=note_id, student=request.user)
     try:
-        start_at = _parse_dt(request.data.get("startAt", note.start_at), "Inicio")
+        start_at = _parse_dt(request.data.get("startAt", note.start_at), "Início")
         end_at = _parse_dt(request.data.get("endAt", note.end_at), "Fim")
     except ValueError as exc:
         return _error(str(exc))
@@ -198,7 +198,7 @@ def calendar_note_item(request, note_id: int):
     title = str(request.data.get("title", note.title) or "").strip()
     description = str(request.data.get("description", note.description) or "").strip()
     if not title or not description or not start_at:
-        return _error("Titulo, descricao e inicio sao obrigatorios.")
+        return _error("Título, descrição e início são obrigatórios.")
 
     note.title = title
     note.description = description

@@ -48,7 +48,7 @@ export function RoleGuard({ expectedRole, wrongRoleRedirect, children }: Props) 
   if (!ok) {
     return (
       <div style={{ padding: "2rem", color: "#64748b" }} aria-live="polite">
-        A validar sessao…
+        Validando sessão...
       </div>
     );
   }

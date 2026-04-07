@@ -12,6 +12,7 @@ import {
 } from "@/lib/api";
 import { MediaImage } from "@/components/MediaImage";
 import { getStoredToken } from "@/lib/cookies";
+import { activityKindBehaviorLabel } from "./ui";
 
 type Props = {
   mode: "create" | "edit";
@@ -108,7 +109,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
         setValidationMessages(activity.validation?.issues.map((issue) => issue.message) ?? []);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Falha ao carregar atividade");
+          setError(err instanceof Error ? err.message : "Falha ao carregar tarefa");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -177,22 +178,22 @@ export function ActivityEditor({ mode, activityId }: Props) {
       setValidationMessages(activity.validation?.issues.map((issue) => issue.message) ?? []);
       router.push(`/professor/atividades/${activity.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao salvar atividade");
+      setError(err instanceof Error ? err.message : "Falha ao salvar tarefa");
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return <p style={{ color: "#64748b" }}>Carregando atividade…</p>;
+    return <p style={{ color: "#64748b" }}>Carregando tarefa...</p>;
   }
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div>
-        <h1 style={{ marginTop: 0 }}>Professor: {mode === "create" ? "nova atividade" : "editar atividade"}</h1>
+        <h1 style={{ marginTop: 0 }}>Professor: {mode === "create" ? "nova tarefa" : "editar tarefa"}</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          O item nasce em <code>draft</code>. A publicacao so acontece depois das validacoes de pontuacao.
+          A tarefa nasce em <code>draft</code>. A publicação só acontece depois das validações de pontuação.
         </p>
       </div>
 
@@ -202,7 +203,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
 
       {validationMessages.length > 0 ? (
         <div style={{ ...panelStyle, borderColor: "#fde68a", background: "#fffbeb" }}>
-          <strong>Resumo de validacao</strong>
+          <strong>Resumo de validação</strong>
           <ul style={{ marginBottom: 0 }}>
             {validationMessages.map((message) => (
               <li key={message}>{message}</li>
@@ -215,11 +216,11 @@ export function ActivityEditor({ mode, activityId }: Props) {
         <section style={panelStyle}>
           <div style={{ display: "grid", gap: 14 }}>
             <label style={{ display: "grid", gap: 6 }}>
-              <span>Titulo</span>
+              <span>Título</span>
               <input value={title} onChange={(event) => setTitle(event.target.value)} required style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }} />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span>Tipo</span>
+              <span>Formato interno</span>
               <select
                 value={kind}
                 onChange={(event) => {
@@ -233,11 +234,14 @@ export function ActivityEditor({ mode, activityId }: Props) {
                 }}
                 style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
               >
-                <option value="prova">Prova</option>
-                <option value="atividade">Atividade</option>
-                <option value="trabalho">Trabalho</option>
+                <option value="prova">Tarefa com questões</option>
+                <option value="atividade">Tarefa com questões</option>
+                <option value="trabalho">Tarefa com anexo</option>
               </select>
             </label>
+            <p style={{ margin: 0, color: "#64748b", lineHeight: 1.6 }}>
+              Comportamento selecionado: <strong>{activityKindBehaviorLabel(kind)}</strong>.
+            </p>
             <label style={{ display: "grid", gap: 6 }}>
               <span>Prazo</span>
               <input
@@ -248,7 +252,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span>Descricao</span>
+              <span>Descrição</span>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -257,7 +261,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span>Pontuacao total</span>
+              <span>Pontuação total</span>
               <input value="100" disabled style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1", background: "#f8fafc" }} />
             </label>
           </div>
@@ -267,7 +271,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
           <section style={panelStyle}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16 }}>
               <div>
-                <h2 style={{ margin: 0 }}>Questoes</h2>
+                <h2 style={{ margin: 0 }}>Questões</h2>
                 <p style={{ margin: "6px 0 0", color: "#64748b" }}>A soma dos pesos deve fechar em 100 para publicar.</p>
               </div>
               <button
@@ -275,7 +279,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
                 onClick={() => setQuestions((current) => [...current, emptyQuestion(current.length + 1)])}
                 style={{ borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
               >
-                Adicionar questao
+                Adicionar questão
               </button>
             </div>
 
@@ -283,7 +287,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
               {questions.map((question, index) => (
                 <article key={`${question.position}-${index}`} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 16, display: "grid", gap: 12 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <strong>Questao {index + 1}</strong>
+                    <strong>Questão {index + 1}</strong>
                     <button type="button" onClick={() => removeQuestion(index)} style={{ border: "none", background: "transparent", color: "#b91c1c", cursor: "pointer" }}>
                       Remover
                     </button>
@@ -321,7 +325,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
                         style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
                       >
                         <option value="dissertativa">Dissertativa</option>
-                        <option value="multipla_escolha">Multipla escolha</option>
+                        <option value="multipla_escolha">Múltipla escolha</option>
                       </select>
                     </label>
                     <label style={{ display: "grid", gap: 6 }}>
@@ -340,7 +344,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
                       {question.supportImageUrl ? (
                         <MediaImage
                           src={question.supportImageUrl}
-                          alt={`Imagem de apoio da questao ${index + 1}`}
+                          alt={`Imagem de apoio da questão ${index + 1}`}
                           style={{ width: "100%", maxWidth: 180, borderRadius: 12, border: "1px solid #cbd5e1" }}
                         />
                       ) : null}
@@ -371,7 +375,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
 
                   {question.type === "multipla_escolha" ? (
                     <div style={{ display: "grid", gap: 10 }}>
-                      <strong>Opcoes</strong>
+                      <strong>Opções</strong>
                       {question.options.map((option, optionIndex) => (
                         <div key={`${option.position}-${optionIndex}`} style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr auto auto" }}>
                           <input
@@ -384,7 +388,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
                               );
                               updateQuestion(index, { options: nextOptions });
                             }}
-                            placeholder={`Opcao ${optionIndex + 1}`}
+                            placeholder={`Opção ${optionIndex + 1}`}
                             style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
                           />
                           <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -430,7 +434,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
                         }
                         style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 14px", background: "#fff", cursor: "pointer" }}
                       >
-                        Adicionar opcao
+                        Adicionar opção
                       </button>
                     </div>
                   ) : null}
@@ -440,9 +444,9 @@ export function ActivityEditor({ mode, activityId }: Props) {
           </section>
         ) : (
           <section style={panelStyle}>
-            <h2 style={{ marginTop: 0 }}>Trabalho sem questoes</h2>
+            <h2 style={{ marginTop: 0 }}>Tarefa com anexo</h2>
             <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: 0 }}>
-              Nesta primeira versao, trabalhos usam descricao e prazo, sem editor de questoes.
+              Nesta primeira versão, tarefas com anexo usam descrição e prazo, sem editor de questões.
             </p>
           </section>
         )}
@@ -453,7 +457,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
             disabled={saving}
             style={{ borderRadius: 10, border: "none", padding: "12px 16px", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: 600 }}
           >
-            {saving ? "Salvando…" : mode === "create" ? "Criar draft" : "Salvar alteracoes"}
+            {saving ? "Salvando..." : mode === "create" ? "Criar rascunho" : "Salvar alterações"}
           </button>
           <button
             type="button"

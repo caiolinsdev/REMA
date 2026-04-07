@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import type { ActivitySummary } from "@rema/contracts";
 import { apiActivities } from "@/lib/api";
 import { getStoredToken } from "@/lib/cookies";
+import {
+  activityKindBehaviorLabel,
+  activityStatusLabel,
+} from "@/modules/activities/ui";
 
 function formatDate(value: string | null) {
   if (!value) return "Sem prazo";
@@ -22,23 +26,27 @@ export default function Page() {
   useEffect(() => {
     const token = getStoredToken();
     if (!token) return;
-    apiActivities(token).then(setActivities).catch((err) => setError(err instanceof Error ? err.message : "Falha ao carregar atividades"));
+    apiActivities(token)
+      .then(setActivities)
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Falha ao carregar tarefas"),
+      );
   }, []);
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ marginTop: 0 }}>Provas, atividades e trabalhos</h1>
+          <h1 style={{ marginTop: 0 }}>Tarefas</h1>
           <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-            Area do professor para criar, editar drafts e publicar itens academicos.
+            Área do professor para criar, editar rascunhos e publicar tarefas.
           </p>
         </div>
         <Link
           href="/professor/atividades/novo"
           style={{ borderRadius: 10, background: "#2563eb", color: "#fff", textDecoration: "none", padding: "12px 16px", fontWeight: 600 }}
         >
-          Nova atividade
+          Nova tarefa
         </Link>
       </div>
 
@@ -51,7 +59,7 @@ export default function Page() {
               <div>
                 <h2 style={{ margin: "0 0 8px" }}>{activity.title}</h2>
                 <p style={{ margin: 0, color: "#64748b" }}>
-                  {activity.kind} · {activity.status} · prazo {formatDate(activity.dueAt)}
+                  {activityKindBehaviorLabel(activity.kind)} · {activityStatusLabel(activity.status)} · prazo {formatDate(activity.dueAt)}
                 </p>
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -65,7 +73,7 @@ export default function Page() {
         ))}
         {activities.length === 0 && !error ? (
           <div style={{ border: "1px dashed #cbd5e1", borderRadius: 16, padding: 18, color: "#64748b" }}>
-            Nenhuma atividade criada ainda.
+            Nenhuma tarefa criada ainda.
           </div>
         ) : null}
       </div>

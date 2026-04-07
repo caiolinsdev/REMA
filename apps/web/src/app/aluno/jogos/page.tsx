@@ -29,10 +29,10 @@ const panelStyle: CSSProperties = {
 function experienceLabel(type: GameSummary["experienceType"]) {
   return {
     quiz: "Quiz",
-    memoria: "Memoria",
-    sequencia: "Sequencia",
+    memoria: "Memória",
+    sequencia: "Sequência",
     palavras: "Palavras",
-    logica: "Logica",
+    logica: "Lógica",
   }[type];
 }
 
@@ -40,13 +40,13 @@ function sourceStrategyLabel(value: GameSummary["sourceStrategy"]) {
   return {
     remote_api: "API externa",
     local_engine: "Local no REMA",
-    hybrid: "Hibrido",
+    hybrid: "Híbrido",
   }[value];
 }
 
 function contentSourceLabel(value: GameRuntimeResponse["contentSource"]) {
   return {
-    remote_api: "Conteudo remoto",
+    remote_api: "Conteúdo remoto",
     local_fallback: "Fallback local",
     local_engine: "Engine local",
   }[value];
@@ -98,7 +98,7 @@ function HangmanPlay({
     onComplete({
       score,
       progress,
-      message: isWon ? "Partida de forca concluida com sucesso." : "Tentativas esgotadas na forca.",
+      message: isWon ? "Partida de forca concluída com sucesso." : "Tentativas esgotadas na forca.",
     });
     setSubmitted(true);
   }
@@ -152,7 +152,7 @@ function HangmanPlay({
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ color: isWon ? "#166534" : "#b91c1c" }}>
             {isWon
-              ? `Voce venceu. Palavra: ${word.toUpperCase()}.`
+              ? `Você venceu. Palavra: ${word.toUpperCase()}.`
               : `Fim de jogo. A palavra era ${word.toUpperCase()}.`}
           </div>
           <button
@@ -223,7 +223,7 @@ function SudokuPlay({
       score,
       progress: score,
       message: checked.solved
-        ? "Sudoku concluido com sucesso."
+        ? "Sudoku concluído com sucesso."
         : "Sudoku verificado e progresso registrado.",
     });
     setSubmitted(true);
@@ -277,7 +277,7 @@ function SudokuPlay({
             fontWeight: 600,
           }}
         >
-          Validar solucao
+          Validar solução
         </button>
         {checked ? (
           <button
@@ -300,7 +300,7 @@ function SudokuPlay({
         <div style={{ color: checked.solved ? "#166534" : "#92400e" }}>
           {checked.solved
             ? "Sudoku resolvido corretamente."
-            : `Voce acertou ${checked.correct} de ${checked.editable} casas editaveis.`}
+            : `Você acertou ${checked.correct} de ${checked.editable} casas editáveis.`}
         </div>
       ) : null}
     </section>
@@ -339,7 +339,7 @@ function QuizPlay({
     onComplete({
       score: result.score,
       progress: 100,
-      message: `${title} concluido com ${result.correct} acertos.`,
+      message: `${title} concluído com ${result.correct} acertos.`,
     });
     setRegistered(true);
   }
@@ -430,7 +430,7 @@ function QuizPlay({
       </div>
       {result ? (
         <div style={{ color: "#166534" }}>
-          Voce acertou {result.correct} de {result.total} perguntas. Score {result.score}.
+          Você acertou {result.correct} de {result.total} perguntas. Score {result.score}.
         </div>
       ) : null}
     </section>
@@ -477,7 +477,7 @@ function MazePlay({
     onComplete({
       score,
       progress: 100,
-      message: "Labirinto concluido ate a saida.",
+      message: "Labirinto concluído até a saída.",
     });
     setSubmitted(true);
   }
@@ -532,7 +532,7 @@ function MazePlay({
       <div style={{ color: "#64748b" }}>Movimentos: {moves}</div>
       {reachedGoal ? (
         <div style={{ display: "grid", gap: 12 }}>
-          <div style={{ color: "#166534" }}>Voce encontrou a saida do labirinto.</div>
+          <div style={{ color: "#166534" }}>Você encontrou a saída do labirinto.</div>
           <button
             type="button"
             disabled={submitted}
@@ -655,7 +655,7 @@ export default function Page() {
       await loadCatalog(selectedGame.id);
       await loadSelectedGame(selectedGame.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao registrar sessao");
+      setError(err instanceof Error ? err.message : "Falha ao registrar sessão");
     }
   }
 
@@ -673,7 +673,7 @@ export default function Page() {
       <div>
         <h1 style={{ marginTop: 0 }}>Jogos</h1>
         <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-          Catalogo curado com 5 jogos e runtime resolvido pelo backend do REMA.
+          Catálogo curado com 5 jogos e runtime resolvido pelo backend do REMA.
         </p>
       </div>
 
@@ -704,10 +704,10 @@ export default function Page() {
                 {experienceLabel(game.experienceType)} · {game.estimatedMinutes} min
               </div>
               <div style={{ color: "#64748b", fontSize: 14 }}>
-                Estrategia: {sourceStrategyLabel(game.sourceStrategy)}
+                Estratégia: {sourceStrategyLabel(game.sourceStrategy)}
               </div>
               <div style={{ color: "#64748b", fontSize: 14, marginTop: 6 }}>
-                Melhor score: {game.bestScore ?? "-"} · Ultimo progresso: {game.lastProgress ?? "-"}%
+                Melhor score: {game.bestScore ?? "-"} · Último progresso: {game.lastProgress ?? "-"}%
               </div>
             </button>
           ))}
@@ -722,8 +722,8 @@ export default function Page() {
                   <p style={{ color: "#475569", lineHeight: 1.6 }}>{selectedGame.description}</p>
                 </div>
                 <div style={{ color: "#64748b" }}>
-                  Tipo: {experienceLabel(selectedGame.experienceType)} · Duracao estimada:{" "}
-                  {selectedGame.estimatedMinutes} min · Estrategia:{" "}
+                  Tipo: {experienceLabel(selectedGame.experienceType)} · Duração estimada:{" "}
+                  {selectedGame.estimatedMinutes} min · Estratégia:{" "}
                   {sourceStrategyLabel(selectedGame.sourceStrategy)}
                 </div>
                 <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
@@ -731,7 +731,7 @@ export default function Page() {
                 </div>
                 {runtime ? (
                   <div style={{ color: "#64748b", fontSize: 14 }}>
-                    Origem do conteudo atual: {contentSourceLabel(runtime.contentSource)}
+                    Origem do conteúdo atual: {contentSourceLabel(runtime.contentSource)}
                   </div>
                 ) : null}
                 <button
@@ -767,7 +767,7 @@ export default function Page() {
                 <QuizPlay
                   key={JSON.stringify(runtime.payload)}
                   runtime={runtime}
-                  title="Quiz de Portugues"
+                  title="Quiz de Português"
                   onComplete={(result) => void handleRegisterSession(result)}
                 />
               ) : null}
@@ -776,7 +776,7 @@ export default function Page() {
                 <QuizPlay
                   key={JSON.stringify(runtime.payload)}
                   runtime={runtime}
-                  title="Quiz de Matematica"
+                  title="Quiz de Matemática"
                   onComplete={(result) => void handleRegisterSession(result)}
                 />
               ) : null}
@@ -790,9 +790,9 @@ export default function Page() {
               ) : null}
 
               <section style={{ ...panelStyle, display: "grid", gap: 12 }}>
-                <h3 style={{ margin: 0 }}>Historico do jogo</h3>
+                <h3 style={{ margin: 0 }}>Histórico do jogo</h3>
                 <div style={{ color: "#64748b" }}>
-                  Total de sessoes: {selectedGame.totalSessions} · Melhor score:{" "}
+                  Total de sessões: {selectedGame.totalSessions} · Melhor score:{" "}
                   {selectedGame.bestScore ?? "-"}
                 </div>
                 {selectedSessions.map((session) => (
@@ -803,12 +803,12 @@ export default function Page() {
                   </article>
                 ))}
                 {selectedSessions.length === 0 ? (
-                  <div style={{ color: "#64748b" }}>Nenhuma sessao registrada para este jogo.</div>
+                  <div style={{ color: "#64748b" }}>Nenhuma sessão registrada para este jogo.</div>
                 ) : null}
               </section>
             </>
           ) : (
-            <div style={{ color: "#64748b" }}>Nenhum jogo disponivel.</div>
+            <div style={{ color: "#64748b" }}>Nenhum jogo disponível.</div>
           )}
         </div>
       </section>
