@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   GameDetail,
@@ -17,6 +17,7 @@ import {
   apiRegisterGameSession,
 } from "@/lib/api";
 import { getStoredToken } from "@/lib/cookies";
+import styles from "./page.module.css";
 
 const panelStyle: CSSProperties = {
   background: "#fff",
@@ -556,6 +557,63 @@ function MazePlay({
   );
 }
 
+function CatalogSkeletonCard() {
+  return (
+    <div className={styles.catalogSkeleton} aria-hidden="true">
+      <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+      <div className={`${styles.skeletonLine} ${styles.skeletonText}`} />
+      <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+      <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+    </div>
+  );
+}
+
+function GameLoadingPanel({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <section className={styles.loadingPanel} aria-live="polite">
+      <div className={styles.loadingHeader}>
+        <div className={styles.loadingOrb} />
+        <div>
+          <div className={styles.loadingBadge}>Loading</div>
+          <h2 className={styles.loadingTitle}>{title}</h2>
+          <p className={styles.loadingText}>{subtitle}</p>
+        </div>
+      </div>
+
+      <div className={styles.loadingGrid} aria-hidden="true">
+        <div className={styles.loadingBlock}>
+          <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonText}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+        </div>
+        <div className={styles.loadingBlock}>
+          <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonText}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+        </div>
+        <div className={styles.loadingBlock}>
+          <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonText}`} />
+          <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+        </div>
+      </div>
+
+      <div className={styles.loadingFooter}>
+        <div className={styles.progressTrack}>
+          <div className={styles.progressFill} />
+        </div>
+        <span className={styles.loadingHint}>Preparando a próxima experiência de jogo...</span>
+      </div>
+    </section>
+  );
+}
+
 export default function Page() {
   const [games, setGames] = useState<GameSummary[]>([]);
   const [sessions, setSessions] = useState<GameSessionSummary[]>([]);
@@ -564,11 +622,19 @@ export default function Page() {
   const [runtime, setRuntime] = useState<GameRuntimeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [loadingRuntime, setLoadingRuntime] = useState(false);
+  const [gamesLoading, setGamesLoading] = useState(true);
+  const [loadingGameId, setLoadingGameId] = useState<string | null>(null);
+  const gameRequestRef = useRef(0);
 
-  async function loadCatalog(nextGameId?: string | null) {
+  async function loadCatalog(
+    nextGameId?: string | null,
+    options?: { showLoadingState?: boolean },
+  ) {
     const token = getStoredToken();
-    if (!token) return;
+    if (!token) return { token: null, targetId: null };
+    if (options?.showLoadingState) {
+      setGamesLoading(true);
+    }
     setError(null);
     try {
       const [gamesPayload, sessionsPayload] = await Promise.all([
@@ -579,38 +645,63 @@ export default function Page() {
       setSessions(sessionsPayload);
       const targetId = nextGameId ?? selectedGameId ?? gamesPayload[0]?.id ?? null;
       setSelectedGameId(targetId);
-      return targetId;
+      return { token, targetId };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Falha ao carregar jogos");
-      return null;
+      return { token, targetId: null };
+    } finally {
+      if (options?.showLoadingState) {
+        setGamesLoading(false);
+      }
     }
   }
 
   async function loadSelectedGame(gameId: string) {
     const token = getStoredToken();
     if (!token) return;
-    setLoadingRuntime(true);
+    const requestId = gameRequestRef.current + 1;
+    gameRequestRef.current = requestId;
+    setLoadingGameId(gameId);
     setError(null);
+    setSelectedGameId(gameId);
+    setSelectedGame(null);
+    setRuntime(null);
     try {
       const [detail, runtimePayload] = await Promise.all([
         apiGameDetail(token, gameId),
         apiGameRuntime(token, gameId),
       ]);
+      if (gameRequestRef.current !== requestId) return;
       setSelectedGame(detail);
       setRuntime(runtimePayload);
     } catch (err) {
+      if (gameRequestRef.current !== requestId) return;
       setError(err instanceof Error ? err.message : "Falha ao abrir jogo");
     } finally {
-      setLoadingRuntime(false);
+      if (gameRequestRef.current === requestId) {
+        setLoadingGameId(null);
+      }
     }
   }
 
   useEffect(() => {
     const token = getStoredToken();
-    if (!token) return;
+    if (!token) {
+      setGamesLoading(false);
+      return;
+    }
 
-    Promise.all([apiGames(token), apiGameSessions(token)])
-      .then(async ([gamesPayload, sessionsPayload]) => {
+    let cancelled = false;
+    (async () => {
+      let requestId: number | null = null;
+      setGamesLoading(true);
+      setError(null);
+      try {
+        const [gamesPayload, sessionsPayload] = await Promise.all([
+          apiGames(token),
+          apiGameSessions(token),
+        ]);
+        if (cancelled) return;
         setGames(gamesPayload);
         setSessions(sessionsPayload);
         const targetId = gamesPayload[0]?.id ?? null;
@@ -620,20 +711,39 @@ export default function Page() {
           setRuntime(null);
           return;
         }
-        setLoadingRuntime(true);
+
+        requestId = gameRequestRef.current + 1;
+        gameRequestRef.current = requestId;
+        setLoadingGameId(targetId);
+        setSelectedGame(null);
+        setRuntime(null);
+
         const [detail, runtimePayload] = await Promise.all([
           apiGameDetail(token, targetId),
           apiGameRuntime(token, targetId),
         ]);
+        if (cancelled || gameRequestRef.current !== requestId) return;
         setSelectedGame(detail);
         setRuntime(runtimePayload);
-      })
-      .catch((err) => {
+      } catch (err) {
+        if (cancelled) return;
         setError(err instanceof Error ? err.message : "Falha ao carregar jogos");
-      })
-      .finally(() => {
-        setLoadingRuntime(false);
-      });
+        setSelectedGame(null);
+        setRuntime(null);
+      } finally {
+        if (!cancelled) {
+          setGamesLoading(false);
+          if (requestId === null || gameRequestRef.current === requestId) {
+            setLoadingGameId(null);
+          }
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      gameRequestRef.current += 1;
+    };
   }, []);
 
   async function handleSelectGame(gameId: string) {
@@ -667,6 +777,12 @@ export default function Page() {
   const selectedSessions = selectedGame
     ? sessions.filter((session) => session.gameId === selectedGame.id)
     : [];
+  const selectedGameSummary = useMemo(
+    () => games.find((game) => game.id === selectedGameId) ?? null,
+    [games, selectedGameId],
+  );
+  const showEmptyState = !gamesLoading && games.length === 0;
+  const showGameLoading = Boolean(loadingGameId) || (gamesLoading && games.length > 0);
 
   return (
     <div style={{ display: "grid", gap: 24 }}>
@@ -682,39 +798,79 @@ export default function Page() {
 
       <section style={{ display: "grid", gridTemplateColumns: "minmax(280px, 360px) 1fr", gap: 20, alignItems: "start" }}>
         <div style={{ display: "grid", gap: 12 }}>
-          {games.map((game) => (
-            <button
-              key={game.id}
-              type="button"
-              onClick={() => void handleSelectGame(game.id)}
-              style={{
-                textAlign: "left",
-                background: game.id === selectedGameId ? "#dbeafe" : "#fff",
-                border: "1px solid #cbd5e1",
-                borderRadius: 16,
-                padding: 16,
-                cursor: "pointer",
-                display: "grid",
-                gap: 8,
-              }}
-            >
-              <strong style={{ display: "block", marginBottom: 8 }}>{game.title}</strong>
-              <div style={{ color: "#475569", marginBottom: 8 }}>{game.description}</div>
-              <div style={{ color: "#64748b", fontSize: 14 }}>
-                {experienceLabel(game.experienceType)} · {game.estimatedMinutes} min
-              </div>
-              <div style={{ color: "#64748b", fontSize: 14 }}>
-                Estratégia: {sourceStrategyLabel(game.sourceStrategy)}
-              </div>
-              <div style={{ color: "#64748b", fontSize: 14, marginTop: 6 }}>
-                Melhor score: {game.bestScore ?? "-"} · Último progresso: {game.lastProgress ?? "-"}%
-              </div>
-            </button>
-          ))}
+          {gamesLoading && games.length === 0
+            ? Array.from({ length: 4 }, (_, index) => <CatalogSkeletonCard key={index} />)
+            : null}
+
+          {!gamesLoading
+            ? games.map((game) => {
+                const isSelected = game.id === selectedGameId;
+                const isLoadingThisGame = game.id === loadingGameId;
+                const disableSelection = Boolean(loadingGameId);
+                return (
+                  <button
+                    key={game.id}
+                    type="button"
+                    disabled={disableSelection}
+                    onClick={() => void handleSelectGame(game.id)}
+                    style={{
+                      textAlign: "left",
+                      background: isSelected ? "#dbeafe" : "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 16,
+                      padding: 16,
+                      cursor: disableSelection ? "wait" : "pointer",
+                      opacity: disableSelection && !isLoadingThisGame ? 0.72 : 1,
+                      display: "grid",
+                      gap: 8,
+                    }}
+                  >
+                    <strong style={{ display: "block", marginBottom: 8 }}>{game.title}</strong>
+                    <div style={{ color: "#475569", marginBottom: 8 }}>{game.description}</div>
+                    <div style={{ color: "#64748b", fontSize: 14 }}>
+                      {experienceLabel(game.experienceType)} · {game.estimatedMinutes} min
+                    </div>
+                    <div style={{ color: "#64748b", fontSize: 14 }}>
+                      Estratégia: {sourceStrategyLabel(game.sourceStrategy)}
+                    </div>
+                    <div style={{ color: "#64748b", fontSize: 14, marginTop: 6 }}>
+                      Melhor score: {game.bestScore ?? "-"} · Último progresso: {game.lastProgress ?? "-"}%
+                    </div>
+                    {isLoadingThisGame ? (
+                      <span className={styles.buttonStatus}>Carregando jogo...</span>
+                    ) : null}
+                  </button>
+                );
+              })
+            : null}
+
+          {showEmptyState ? (
+            <div style={{ ...panelStyle, color: "#64748b" }}>
+              Nenhum jogo disponível.
+            </div>
+          ) : null}
         </div>
 
         <div style={{ display: "grid", gap: 16 }}>
-          {selectedGame ? (
+          {gamesLoading && games.length === 0 ? (
+            <GameLoadingPanel
+              title="Carregando catálogo de jogos"
+              subtitle="Buscando o catálogo curado e preparando a primeira partida."
+            />
+          ) : null}
+
+          {!gamesLoading && showGameLoading ? (
+            <GameLoadingPanel
+              title={
+                selectedGameSummary
+                  ? `Preparando ${selectedGameSummary.title}`
+                  : "Preparando jogo"
+              }
+              subtitle="Estamos carregando o detalhe e o runtime da nova partida para você."
+            />
+          ) : null}
+
+          {!gamesLoading && !showGameLoading && selectedGame && runtime ? (
             <>
               <section style={{ ...panelStyle, display: "grid", gap: 12 }}>
                 <div>
@@ -737,15 +893,12 @@ export default function Page() {
                 <button
                   type="button"
                   onClick={() => void handleRefreshRuntime()}
+                  disabled={Boolean(loadingGameId)}
                   style={{ width: "fit-content", borderRadius: 10, border: "1px solid #cbd5e1", padding: "12px 16px", background: "#fff", cursor: "pointer" }}
                 >
-                  Gerar nova partida
+                  {loadingGameId === selectedGame.id ? "Preparando..." : "Gerar nova partida"}
                 </button>
               </section>
-
-              {loadingRuntime ? (
-                <div style={{ ...panelStyle, color: "#64748b" }}>Carregando runtime do jogo...</div>
-              ) : null}
 
               {runtime?.kind === "hangman" ? (
                 <HangmanPlay
@@ -807,9 +960,15 @@ export default function Page() {
                 ) : null}
               </section>
             </>
-          ) : (
-            <div style={{ color: "#64748b" }}>Nenhum jogo disponível.</div>
-          )}
+          ) : null}
+
+          {!gamesLoading && !showGameLoading && !selectedGame && !showEmptyState ? (
+            <div style={{ ...panelStyle, color: error ? "#b91c1c" : "#64748b" }}>
+              {error
+                ? "Não foi possível carregar o jogo selecionado. Tente novamente pela lista."
+                : "Selecione um jogo do catálogo para começar."}
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
