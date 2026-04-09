@@ -6,9 +6,18 @@ import { PhasePlaceholderScreen } from "../screens/PhasePlaceholderScreen";
 import { ActivityEditorScreen } from "../screens/professor/ActivityEditorScreen";
 import { ProfessorActivitiesListScreen } from "../screens/professor/ProfessorActivitiesListScreen";
 import { ProfessorActivityDetailScreen } from "../screens/professor/ProfessorActivityDetailScreen";
+import { ProfessorCalendarScreen } from "../screens/professor/ProfessorCalendarScreen";
+import { ProfessorContentDetailScreen } from "../screens/professor/ProfessorContentDetailScreen";
+import { ProfessorContentEditorScreen } from "../screens/professor/ProfessorContentEditorScreen";
+import { ProfessorContentsListScreen } from "../screens/professor/ProfessorContentsListScreen";
+import { ProfessorProfileScreen } from "../screens/professor/ProfessorProfileScreen";
 import { ProfessorSubmissionReviewScreen } from "../screens/professor/ProfessorSubmissionReviewScreen";
 import { StudentActivitiesListScreen } from "../screens/student/StudentActivitiesListScreen";
 import { StudentActivityDetailScreen } from "../screens/student/StudentActivityDetailScreen";
+import { StudentCalendarScreen } from "../screens/student/StudentCalendarScreen";
+import { StudentContentDetailScreen } from "../screens/student/StudentContentDetailScreen";
+import { StudentContentsListScreen } from "../screens/student/StudentContentsListScreen";
+import { StudentProfileScreen } from "../screens/student/StudentProfileScreen";
 import { StudentHomeScreen } from "../screens/StudentHomeScreen";
 import { TeacherHomeScreen } from "../screens/TeacherHomeScreen";
 import { stackScreenOptions } from "../theme";
@@ -64,12 +73,19 @@ export function AlunoTarefasStack() {
 
 export function AlunoConteudosStack() {
   return (
-    <AlunoConteudosNav.Navigator screenOptions={stackInsideDrawer}>
+    <AlunoConteudosNav.Navigator
+      screenOptions={stackInsideDrawer}
+      initialRouteName="AlunoConteudosList"
+    >
       <AlunoConteudosNav.Screen
-        name="AlunoConteudosIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Conteúdos", 3)}
+        name="AlunoConteudosList"
+        component={StudentContentsListScreen}
         options={{ title: "Conteúdos" }}
+      />
+      <AlunoConteudosNav.Screen
+        name="AlunoConteudosDetail"
+        component={StudentContentDetailScreen}
+        options={{ title: "Conteúdo" }}
       />
     </AlunoConteudosNav.Navigator>
   );
@@ -80,8 +96,7 @@ export function AlunoCalendarioStack() {
     <AlunoCalendarioNav.Navigator screenOptions={stackInsideDrawer}>
       <AlunoCalendarioNav.Screen
         name="AlunoCalendarioIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Calendário", 3)}
+        component={StudentCalendarScreen}
         options={{ title: "Calendário" }}
       />
     </AlunoCalendarioNav.Navigator>
@@ -119,8 +134,7 @@ export function AlunoPerfilStack() {
     <AlunoPerfilNav.Navigator screenOptions={stackInsideDrawer}>
       <AlunoPerfilNav.Screen
         name="AlunoPerfilIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Perfil", 3)}
+        component={StudentProfileScreen}
         options={{ title: "Perfil" }}
       />
     </AlunoPerfilNav.Navigator>
@@ -173,12 +187,29 @@ export function ProfessorTarefasStack() {
 
 export function ProfessorConteudosStack() {
   return (
-    <ProfConteudosNav.Navigator screenOptions={stackInsideDrawer}>
+    <ProfConteudosNav.Navigator
+      screenOptions={stackInsideDrawer}
+      initialRouteName="ProfConteudosList"
+    >
       <ProfConteudosNav.Screen
-        name="ProfConteudosIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Conteúdos", 3)}
+        name="ProfConteudosList"
+        component={ProfessorContentsListScreen}
         options={{ title: "Conteúdos" }}
+      />
+      <ProfConteudosNav.Screen
+        name="ProfConteudosNova"
+        component={ProfessorContentEditorScreen}
+        options={{ title: "Novo conteúdo" }}
+      />
+      <ProfConteudosNav.Screen
+        name="ProfConteudosDetail"
+        component={ProfessorContentDetailScreen}
+        options={{ title: "Conteúdo" }}
+      />
+      <ProfConteudosNav.Screen
+        name="ProfConteudosEditar"
+        component={ProfessorContentEditorScreen}
+        options={{ title: "Editar conteúdo" }}
       />
     </ProfConteudosNav.Navigator>
   );
@@ -189,8 +220,7 @@ export function ProfessorCalendarioStack() {
     <ProfCalendarioNav.Navigator screenOptions={stackInsideDrawer}>
       <ProfCalendarioNav.Screen
         name="ProfCalendarioIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Calendário", 3)}
+        component={ProfessorCalendarScreen}
         options={{ title: "Calendário" }}
       />
     </ProfCalendarioNav.Navigator>
@@ -215,8 +245,7 @@ export function ProfessorPerfilStack() {
     <ProfPerfilNav.Navigator screenOptions={stackInsideDrawer}>
       <ProfPerfilNav.Screen
         name="ProfPerfilIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Perfil", 3)}
+        component={ProfessorProfileScreen}
         options={{ title: "Perfil" }}
       />
     </ProfPerfilNav.Navigator>

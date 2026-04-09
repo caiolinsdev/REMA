@@ -14,7 +14,14 @@
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O REMA precisa acessar suas fotos para enviar imagens, vídeos e avatares.",
+          "cameraPermission": "O REMA pode usar a câmera se você preferir tirar uma foto."
+        }
+      ]
     ]
   }
 }

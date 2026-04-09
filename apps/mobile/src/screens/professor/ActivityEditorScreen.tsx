@@ -16,6 +16,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import type { ActivityDetail, QuestionInput, UpsertActivityRequest } from "@rema/contracts";
 
+import { AppMediaImage } from "../../components/AppMediaImage";
 import { BodyText, MutedText } from "../../components/ui/BodyText";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
 import { LoadingCenter } from "../../components/ui/LoadingCenter";
@@ -23,7 +24,8 @@ import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { Screen } from "../../components/ui/Screen";
 import { SectionTitle } from "../../components/ui/Title";
 import { useAuth } from "../../context/AuthContext";
-import { apiActivityDetail, apiCreateActivity, apiUpdateActivity } from "../../lib/api";
+import { apiActivityDetail, apiCreateActivity, apiUpdateActivity, apiUploadMedia } from "../../lib/api";
+import { pickImageForUpload } from "../../lib/mediaPick";
 import { activityKindBehaviorLabel } from "../../modules/activities/ui";
 import type { ProfTarefasStackParamList } from "../../navigation/tarefasTypes";
 import { theme } from "../../theme";
@@ -97,6 +99,7 @@ export function ActivityEditorScreen() {
   const [showKindModal, setShowKindModal] = useState(false);
   const [questions, setQuestions] = useState<FormQuestion[]>([emptyQuestion(1)]);
   const [validationMessages, setValidationMessages] = useState<string[]>([]);
+  const [uploadingSupportIndex, setUploadingSupportIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (mode !== "edit" || !activityId || !token) return;
@@ -150,6 +153,22 @@ export function ActivityEditorScreen() {
         .filter((_, currentIndex) => currentIndex !== index)
         .map((question, currentIndex) => ({ ...question, position: currentIndex + 1 })),
     );
+  }
+
+  async function handleSupportUpload(index: number) {
+    if (!token) return;
+    setUploadingSupportIndex(index);
+    setError(null);
+    try {
+      const file = await pickImageForUpload();
+      if (!file) return;
+      const uploaded = await apiUploadMedia(token, file, "activity_support_image");
+      updateQuestion(index, { supportImageUrl: uploaded.url });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao enviar imagem de apoio");
+    } finally {
+      setUploadingSupportIndex(null);
+    }
   }
 
   async function onSubmit() {
@@ -363,9 +382,30 @@ export function ActivityEditorScreen() {
                 onChangeText={(t) => updateQuestion(index, { weight: Number(t) || 0 })}
               />
 
-              <MutedText style={styles.fase3}>
-                Imagem de apoio: use o site no computador ou aguarde a Fase 3 do app móvel.
-              </MutedText>
+              <Text style={styles.label}>Imagem de apoio</Text>
+              {question.supportImageUrl ? (
+                <AppMediaImage
+                  src={question.supportImageUrl}
+                  style={styles.supportPreview}
+                  resizeMode="contain"
+                />
+              ) : null}
+              <Pressable
+                style={styles.smallBtn}
+                disabled={uploadingSupportIndex === index}
+                onPress={() => void handleSupportUpload(index)}
+              >
+                <Text style={styles.smallBtnText}>
+                  {uploadingSupportIndex === index ? "Enviando…" : "Escolher imagem (png, jpeg, webp)"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={styles.smallBtn}
+                disabled={!question.supportImageUrl || uploadingSupportIndex === index}
+                onPress={() => updateQuestion(index, { supportImageUrl: "" })}
+              >
+                <Text style={styles.smallBtnText}>Remover imagem</Text>
+              </Pressable>
 
               <Text style={styles.label}>Resposta esperada / gabarito</Text>
               <TextInput
@@ -570,7 +610,7 @@ const styles = StyleSheet.create({
   chipOn: { borderColor: theme.colors.primary, backgroundColor: "#eff6ff" },
   chipText: { color: theme.colors.text },
   chipOnText: { color: theme.colors.primary, fontWeight: "700" },
-  fase3: { marginTop: theme.space.xs },
+  supportPreview: { width: "100%", height: 160, borderRadius: theme.radius.md },
   optionsBlock: { gap: theme.space.sm, marginTop: theme.space.sm },
   optionRow: { gap: theme.space.sm, marginBottom: theme.space.sm },
   optionInput: { marginBottom: 0 },

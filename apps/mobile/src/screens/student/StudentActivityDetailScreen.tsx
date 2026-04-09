@@ -11,7 +11,12 @@ import {
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import type { ActivityDetail, SubmissionDetail, UpsertSubmissionRequest } from "@rema/contracts";
+import type {
+  ActivityDetail,
+  SubmissionDetail,
+  SubmissionFileInput,
+  UpsertSubmissionRequest,
+} from "@rema/contracts";
 
 import { BodyText, MutedText } from "../../components/ui/BodyText";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
@@ -26,6 +31,7 @@ import {
   apiCurrentSubmission,
   apiSaveSubmission,
 } from "../../lib/api";
+import { pickWorkSubmissionFile } from "../../lib/mediaPick";
 import { resolveMediaUrl } from "../../lib/mediaUrl";
 import {
   activityKindBehaviorLabel,
@@ -68,6 +74,8 @@ export function StudentActivityDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [workFile, setWorkFile] = useState<SubmissionFileInput | null>(null);
+  const [pickingWork, setPickingWork] = useState(false);
   const submissionRef = useRef<SubmissionDetail | null>(null);
   submissionRef.current = submission;
 
@@ -107,6 +115,15 @@ export function StudentActivityDetailScreen() {
     setAnswers(nextAnswers);
   }, [submission]);
 
+  useEffect(() => {
+    if (!submission?.files?.length) {
+      setWorkFile(null);
+      return;
+    }
+    const f = submission.files[0];
+    setWorkFile({ fileName: f.fileName, fileUrl: f.fileUrl, fileType: f.fileType });
+  }, [submission]);
+
   const isLocked = submission?.status === "submitted" || submission?.status === "reviewed";
   const currentQuestion = activity?.questions?.[activeQuestionIndex] ?? null;
 
@@ -124,7 +141,7 @@ export function StudentActivityDetailScreen() {
   function buildSubmissionBody(): UpsertSubmissionRequest {
     if (!activity) return {};
     if (activity.kind === "trabalho") {
-      return { files: [] };
+      return { files: workFile ? [workFile] : [] };
     }
     return {
       answers:
@@ -343,13 +360,68 @@ export function StudentActivityDetailScreen() {
       ) : (
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>Entrega com anexo</Text>
-          <BodyText>
-            No aplicativo, o envio de arquivo (pdf, doc, docx, txt) estará disponível na Fase 3. Para
-            anexar o trabalho agora, use o site no computador.
-          </BodyText>
-          <MutedText style={styles.faseHint}>
-            Salvar ou confirmar envio com anexo pelo mobile não está disponível nesta versão.
-          </MutedText>
+          <MutedText>Formatos aceitos: pdf, doc, docx ou txt.</MutedText>
+          {workFile ? (
+            <BodyText>
+              <Text style={styles.bold}>Arquivo:</Text> {workFile.fileName}
+            </BodyText>
+          ) : (
+            <MutedText>Nenhum arquivo selecionado.</MutedText>
+          )}
+          {!isLocked ? (
+            <View style={styles.workActions}>
+              <Pressable
+                style={[styles.secondaryBtn, styles.fullWidth, pickingWork && styles.btnDisabled]}
+                disabled={pickingWork}
+                onPress={async () => {
+                  setPickingWork(true);
+                  try {
+                    const picked = await pickWorkSubmissionFile();
+                    if (picked) {
+                      setWorkFile({
+                        fileName: picked.fileName,
+                        fileUrl: picked.fileUrl,
+                        fileType: picked.fileType,
+                      });
+                    }
+                  } finally {
+                    setPickingWork(false);
+                  }
+                }}
+              >
+                <Text style={styles.secondaryBtnTextCenter}>
+                  {pickingWork ? "Abrindo seletor…" : "Escolher arquivo"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.secondaryBtn, styles.fullWidth, !workFile && styles.btnDisabled]}
+                disabled={!workFile}
+                onPress={() => setWorkFile(null)}
+              >
+                <Text style={styles.secondaryBtnTextCenter}>Remover arquivo</Text>
+              </Pressable>
+            </View>
+          ) : null}
+          {!isLocked ? (
+            <View style={styles.actions}>
+              <Pressable
+                style={[styles.secondaryBtn, styles.fullWidth, (saving || confirming) && styles.btnDisabled]}
+                disabled={saving || confirming}
+                onPress={() => void saveDraft()}
+              >
+                <Text style={styles.secondaryBtnTextCenter}>
+                  {saving ? "Salvando…" : "Salvar em andamento"}
+                </Text>
+              </Pressable>
+              <PrimaryButton
+                loading={confirming}
+                disabled={saving}
+                onPress={() => void confirmSubmission()}
+              >
+                {confirming ? "Confirmando…" : "Confirmar envio único"}
+              </PrimaryButton>
+            </View>
+          ) : null}
         </View>
       )}
     </Screen>
@@ -405,5 +477,5 @@ const styles = StyleSheet.create({
   fullWidth: { alignSelf: "stretch", alignItems: "center", paddingVertical: 14 },
   btnDisabled: { opacity: 0.4 },
   actions: { gap: theme.space.sm, marginBottom: theme.space.xl },
-  faseHint: { marginTop: theme.space.sm },
+  workActions: { gap: theme.space.sm, marginTop: theme.space.sm },
 });
