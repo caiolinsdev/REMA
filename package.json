@@ -10,11 +10,19 @@
     "dev:web": "npm run dev --workspace @rema/web",
     "dev:mobile": "npm run start --workspace @rema/mobile",
     "dev:api": "./apps/api/.venv/bin/python ./apps/api/manage.py runserver 0.0.0.0:8000",
-    "docker:up": "docker compose -f infra/docker/docker-compose.yml up --build",
-    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "docker:up": "docker compose -f infra/docker/docker-compose.yml --env-file .env up --build",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml --env-file .env down",
     "lint": "npm run lint --workspaces --if-present"
   },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native-reanimated": "4.1.1",
+    "react-native-worklets": "0.5.1"
+  },
   "devDependencies": {
-    "next": "^16.2.2"
+    "next": "^16.2.2",
+    "react-native-reanimated": "4.1.1",
+    "react-native-worklets": "0.5.1"
   }
 }
