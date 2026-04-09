@@ -3,6 +3,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import type { PhasePlaceholderParams } from "../screens/PhasePlaceholderScreen";
 import { PhasePlaceholderScreen } from "../screens/PhasePlaceholderScreen";
+import { ActivityEditorScreen } from "../screens/professor/ActivityEditorScreen";
+import { ProfessorActivitiesListScreen } from "../screens/professor/ProfessorActivitiesListScreen";
+import { ProfessorActivityDetailScreen } from "../screens/professor/ProfessorActivityDetailScreen";
+import { ProfessorSubmissionReviewScreen } from "../screens/professor/ProfessorSubmissionReviewScreen";
+import { StudentActivitiesListScreen } from "../screens/student/StudentActivitiesListScreen";
+import { StudentActivityDetailScreen } from "../screens/student/StudentActivityDetailScreen";
 import { StudentHomeScreen } from "../screens/StudentHomeScreen";
 import { TeacherHomeScreen } from "../screens/TeacherHomeScreen";
 import { stackScreenOptions } from "../theme";
@@ -41,12 +47,16 @@ function phaseParams(title: string, phase: number): PhasePlaceholderParams {
 
 export function AlunoTarefasStack() {
   return (
-    <AlunoTarefasNav.Navigator screenOptions={stackInsideDrawer}>
+    <AlunoTarefasNav.Navigator screenOptions={stackInsideDrawer} initialRouteName="AlunoTarefasList">
       <AlunoTarefasNav.Screen
-        name="AlunoTarefasIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Tarefas", 2)}
+        name="AlunoTarefasList"
+        component={StudentActivitiesListScreen}
         options={{ title: "Tarefas" }}
+      />
+      <AlunoTarefasNav.Screen
+        name="AlunoTarefasDetail"
+        component={StudentActivityDetailScreen}
+        options={{ title: "Tarefa" }}
       />
     </AlunoTarefasNav.Navigator>
   );
@@ -131,12 +141,31 @@ export function ProfessorHomeStack() {
 
 export function ProfessorTarefasStack() {
   return (
-    <ProfTarefasNav.Navigator screenOptions={stackInsideDrawer}>
+    <ProfTarefasNav.Navigator screenOptions={stackInsideDrawer} initialRouteName="ProfTarefasList">
       <ProfTarefasNav.Screen
-        name="ProfTarefasIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Tarefas", 2)}
+        name="ProfTarefasList"
+        component={ProfessorActivitiesListScreen}
         options={{ title: "Tarefas" }}
+      />
+      <ProfTarefasNav.Screen
+        name="ProfTarefasNova"
+        component={ActivityEditorScreen}
+        options={{ title: "Nova tarefa" }}
+      />
+      <ProfTarefasNav.Screen
+        name="ProfTarefasDetail"
+        component={ProfessorActivityDetailScreen}
+        options={{ title: "Tarefa" }}
+      />
+      <ProfTarefasNav.Screen
+        name="ProfTarefasEditar"
+        component={ActivityEditorScreen}
+        options={{ title: "Editar tarefa" }}
+      />
+      <ProfTarefasNav.Screen
+        name="ProfTarefasEnvio"
+        component={ProfessorSubmissionReviewScreen}
+        options={{ title: "Correção" }}
       />
     </ProfTarefasNav.Navigator>
   );
