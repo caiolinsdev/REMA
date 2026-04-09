@@ -6,29 +6,25 @@ import {
   type DrawerContentComponentProps,
 } from "@react-navigation/drawer";
 
+import { theme } from "../theme";
 import { useAuth } from "../context/AuthContext";
-import { PlaceholderScreen } from "../screens/PlaceholderScreen";
+import {
+  AlunoCalendarioStack,
+  AlunoComunidadeStack,
+  AlunoConteudosStack,
+  AlunoHomeStack,
+  AlunoJogosStack,
+  AlunoPerfilStack,
+  AlunoTarefasStack,
+  ProfessorCalendarioStack,
+  ProfessorComunidadeStack,
+  ProfessorConteudosStack,
+  ProfessorHomeStack,
+  ProfessorPerfilStack,
+  ProfessorTarefasStack,
+} from "./sectionStacks";
 
 const Drawer = createDrawerNavigator();
-
-const alunoScreens: { name: string; title: string; subtitle?: string }[] = [
-  { name: "AlunoHome", title: "Home", subtitle: "Resumo (waves seguintes)." },
-  { name: "AlunoAtividades", title: "Tarefas", subtitle: "Wave 2+." },
-  { name: "AlunoConteudos", title: "Conteúdos", subtitle: "Wave 4." },
-  { name: "AlunoCalendario", title: "Calendário", subtitle: "Wave 4." },
-  { name: "AlunoJogos", title: "Jogos", subtitle: "Wave 6." },
-  { name: "AlunoComunidade", title: "Comunidade", subtitle: "Wave 5." },
-  { name: "AlunoPerfil", title: "Perfil", subtitle: "Wave 5." },
-];
-
-const professorScreens: { name: string; title: string; subtitle?: string }[] = [
-  { name: "ProfHome", title: "Home", subtitle: "Resumo (waves seguintes)." },
-  { name: "ProfAtividades", title: "Tarefas", subtitle: "Wave 2+." },
-  { name: "ProfConteudos", title: "Conteúdos", subtitle: "Wave 4." },
-  { name: "ProfCalendario", title: "Calendário", subtitle: "Wave 4." },
-  { name: "ProfComunidade", title: "Comunidade", subtitle: "Wave 5." },
-  { name: "ProfPerfil", title: "Perfil", subtitle: "Wave 5." },
-];
 
 function DrawerContent(props: DrawerContentComponentProps) {
   const { signOut } = useAuth();
@@ -43,26 +39,73 @@ function DrawerContent(props: DrawerContentComponentProps) {
 export function MainDrawer() {
   const { user } = useAuth();
   const isAluno = user?.role === "aluno";
-  const screens = isAluno ? alunoScreens : professorScreens;
+
+  if (isAluno) {
+    return (
+      <Drawer.Navigator
+        drawerContent={(p) => <DrawerContent {...p} />}
+        screenOptions={{
+          drawerActiveTintColor: theme.colors.primary,
+          headerShown: false,
+        }}
+      >
+        <Drawer.Screen name="AlunoHome" component={AlunoHomeStack} options={{ title: "Home", drawerLabel: "Home" }} />
+        <Drawer.Screen
+          name="AlunoTarefas"
+          component={AlunoTarefasStack}
+          options={{ title: "Tarefas", drawerLabel: "Tarefas" }}
+        />
+        <Drawer.Screen
+          name="AlunoConteudos"
+          component={AlunoConteudosStack}
+          options={{ title: "Conteúdos", drawerLabel: "Conteúdos" }}
+        />
+        <Drawer.Screen
+          name="AlunoCalendario"
+          component={AlunoCalendarioStack}
+          options={{ title: "Calendário", drawerLabel: "Calendário" }}
+        />
+        <Drawer.Screen name="AlunoJogos" component={AlunoJogosStack} options={{ title: "Jogos", drawerLabel: "Jogos" }} />
+        <Drawer.Screen
+          name="AlunoComunidade"
+          component={AlunoComunidadeStack}
+          options={{ title: "Comunidade", drawerLabel: "Comunidade" }}
+        />
+        <Drawer.Screen name="AlunoPerfil" component={AlunoPerfilStack} options={{ title: "Perfil", drawerLabel: "Perfil" }} />
+      </Drawer.Navigator>
+    );
+  }
 
   return (
     <Drawer.Navigator
       drawerContent={(p) => <DrawerContent {...p} />}
       screenOptions={{
-        drawerActiveTintColor: "#2563eb",
-        headerStyle: { backgroundColor: "#0f172a" },
-        headerTintColor: "#f8fafc",
+        drawerActiveTintColor: theme.colors.primary,
+        headerShown: false,
       }}
     >
-      {screens.map((s) => (
-        <Drawer.Screen
-          key={s.name}
-          name={s.name}
-          options={{ title: s.title, drawerLabel: s.title }}
-        >
-          {() => <PlaceholderScreen title={s.title} subtitle={s.subtitle} />}
-        </Drawer.Screen>
-      ))}
+      <Drawer.Screen name="ProfHome" component={ProfessorHomeStack} options={{ title: "Home", drawerLabel: "Home" }} />
+      <Drawer.Screen
+        name="ProfTarefas"
+        component={ProfessorTarefasStack}
+        options={{ title: "Tarefas", drawerLabel: "Tarefas" }}
+      />
+      <Drawer.Screen
+        name="ProfConteudos"
+        component={ProfessorConteudosStack}
+        options={{ title: "Conteúdos", drawerLabel: "Conteúdos" }}
+      />
+      <Drawer.Screen
+        name="ProfCalendario"
+        component={ProfessorCalendarioStack}
+        options={{ title: "Calendário", drawerLabel: "Calendário" }}
+      />
+      <Drawer.Screen
+        name="ProfComunidade"
+        component={ProfessorComunidadeStack}
+        options={{ title: "Comunidade", drawerLabel: "Comunidade" }}
+      />
+      <Drawer.Screen name="ProfPerfil" component={ProfessorPerfilStack} options={{ title: "Perfil", drawerLabel: "Perfil" }} />
     </Drawer.Navigator>
   );
 }
