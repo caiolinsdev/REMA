@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { apiLogin, apiLogout, apiMe } from "../lib/api";
+import { apiLogin, apiLogout, apiMe, setUnauthorizedHandler } from "../lib/api";
 import type { LoginRequest, MeResponse } from "@rema/contracts";
 
 const TOKEN_KEY = "rema_token";
@@ -77,6 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
   }, [token]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      void signOut();
+    });
+    return () => setUnauthorizedHandler(undefined);
+  }, [signOut]);
 
   const value = useMemo(
     () => ({

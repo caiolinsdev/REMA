@@ -35,10 +35,6 @@ export default function Home() {
       <div className={styles.card}>
         <p className={styles.badge}>REMA</p>
         <h1 className={styles.title}>Entrar</h1>
-        <p className={styles.hint}>
-          Todo o acesso ao sistema começa aqui. Contas demo: <code>aluno@demo.local</code>{" "}
-          ou <code>professor@demo.local</code> com senha <code>demo123</code>.
-        </p>
         <form className={styles.form} onSubmit={onSubmit}>
           <label className={styles.label}>
             Email

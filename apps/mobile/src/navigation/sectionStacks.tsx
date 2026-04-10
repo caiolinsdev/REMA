@@ -1,8 +1,6 @@
 import { DrawerToggleButton } from "@react-navigation/drawer";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import type { PhasePlaceholderParams } from "../screens/PhasePlaceholderScreen";
-import { PhasePlaceholderScreen } from "../screens/PhasePlaceholderScreen";
 import { ActivityEditorScreen } from "../screens/professor/ActivityEditorScreen";
 import { ProfessorActivitiesListScreen } from "../screens/professor/ProfessorActivitiesListScreen";
 import { ProfessorActivityDetailScreen } from "../screens/professor/ProfessorActivityDetailScreen";
@@ -10,13 +8,16 @@ import { ProfessorCalendarScreen } from "../screens/professor/ProfessorCalendarS
 import { ProfessorContentDetailScreen } from "../screens/professor/ProfessorContentDetailScreen";
 import { ProfessorContentEditorScreen } from "../screens/professor/ProfessorContentEditorScreen";
 import { ProfessorContentsListScreen } from "../screens/professor/ProfessorContentsListScreen";
+import { ProfessorCommunityScreen } from "../screens/professor/ProfessorCommunityScreen";
 import { ProfessorProfileScreen } from "../screens/professor/ProfessorProfileScreen";
 import { ProfessorSubmissionReviewScreen } from "../screens/professor/ProfessorSubmissionReviewScreen";
 import { StudentActivitiesListScreen } from "../screens/student/StudentActivitiesListScreen";
 import { StudentActivityDetailScreen } from "../screens/student/StudentActivityDetailScreen";
 import { StudentCalendarScreen } from "../screens/student/StudentCalendarScreen";
+import { StudentCommunityScreen } from "../screens/student/StudentCommunityScreen";
 import { StudentContentDetailScreen } from "../screens/student/StudentContentDetailScreen";
 import { StudentContentsListScreen } from "../screens/student/StudentContentsListScreen";
+import { StudentGamesScreen } from "../screens/student/StudentGamesScreen";
 import { StudentProfileScreen } from "../screens/student/StudentProfileScreen";
 import { StudentHomeScreen } from "../screens/StudentHomeScreen";
 import { TeacherHomeScreen } from "../screens/TeacherHomeScreen";
@@ -48,10 +49,6 @@ export function AlunoHomeStack() {
       <AlunoHomeNav.Screen name="AlunoHomeIndex" component={StudentHomeScreen} options={{ title: "Home" }} />
     </AlunoHomeNav.Navigator>
   );
-}
-
-function phaseParams(title: string, phase: number): PhasePlaceholderParams {
-  return { title, phase };
 }
 
 export function AlunoTarefasStack() {
@@ -108,8 +105,7 @@ export function AlunoJogosStack() {
     <AlunoJogosNav.Navigator screenOptions={stackInsideDrawer}>
       <AlunoJogosNav.Screen
         name="AlunoJogosIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Jogos", 4)}
+        component={StudentGamesScreen}
         options={{ title: "Jogos" }}
       />
     </AlunoJogosNav.Navigator>
@@ -121,8 +117,7 @@ export function AlunoComunidadeStack() {
     <AlunoComunidadeNav.Navigator screenOptions={stackInsideDrawer}>
       <AlunoComunidadeNav.Screen
         name="AlunoComunidadeIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Comunidade", 4)}
+        component={StudentCommunityScreen}
         options={{ title: "Comunidade" }}
       />
     </AlunoComunidadeNav.Navigator>
@@ -232,8 +227,7 @@ export function ProfessorComunidadeStack() {
     <ProfComunidadeNav.Navigator screenOptions={stackInsideDrawer}>
       <ProfComunidadeNav.Screen
         name="ProfComunidadeIndex"
-        component={PhasePlaceholderScreen}
-        initialParams={phaseParams("Comunidade", 4)}
+        component={ProfessorCommunityScreen}
         options={{ title: "Comunidade" }}
       />
     </ProfComunidadeNav.Navigator>

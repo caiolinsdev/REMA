@@ -90,6 +90,21 @@ function logNetworkFailure(label: string, url: string, err: unknown): void {
   console.warn(`[REMA API] ${label} falhou (rede ou URL)`, { url, message: msg, err });
 }
 
+let unauthorizedHandler: (() => void) | undefined;
+
+/** Registrado pelo AuthProvider para encerrar sessão em 401. */
+export function setUnauthorizedHandler(handler: (() => void) | undefined): void {
+  unauthorizedHandler = handler;
+}
+
+function notifyUnauthorized(): void {
+  try {
+    unauthorizedHandler?.();
+  } catch {
+    /* evita quebrar o fluxo de erro da requisição */
+  }
+}
+
 async function authorizedRequest<T>(token: string, path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${getApiBase()}${path}`, {
     ...init,
@@ -101,7 +116,14 @@ async function authorizedRequest<T>(token: string, path: string, init?: RequestI
   });
   const data = await parseJson(res);
   if (!res.ok) {
-    const error = new Error(getErrorMessage(data, "Falha na requisição")) as Error & {
+    if (res.status === 401) {
+      notifyUnauthorized();
+    }
+    const error = new Error(
+      res.status === 401
+        ? "Sessão expirada. Faça login novamente."
+        : getErrorMessage(data, "Falha na requisição"),
+    ) as Error & {
       status?: number;
     };
     error.status = res.status;
@@ -377,7 +399,14 @@ export async function apiUploadMedia(
   });
   const data = await parseJson(res);
   if (!res.ok) {
-    throw new Error(getErrorMessage(data, "Falha ao enviar arquivo"));
+    if (res.status === 401) {
+      notifyUnauthorized();
+    }
+    throw new Error(
+      res.status === 401
+        ? "Sessão expirada. Faça login novamente."
+        : getErrorMessage(data, "Falha ao enviar arquivo"),
+    );
   }
   return data as MediaUploadResponse;
 }

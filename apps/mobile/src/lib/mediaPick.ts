@@ -38,6 +38,21 @@ export async function pickImageForUpload(): Promise<MediaUploadFile | null> {
   return { uri: a.uri, name, type };
 }
 
+export async function pickGifForUpload(): Promise<MediaUploadFile | null> {
+  const result = await DocumentPicker.getDocumentAsync({
+    type: "image/gif",
+    copyToCacheDirectory: true,
+  });
+  if (result.canceled || !result.assets?.[0]) return null;
+  const asset = result.assets[0];
+  const name = asset.name;
+  if (!name.toLowerCase().endsWith(".gif")) {
+    Alert.alert("Arquivo inválido", "Selecione um arquivo GIF.");
+    return null;
+  }
+  return { uri: asset.uri, name, type: "image/gif" };
+}
+
 export async function pickVideoForUpload(): Promise<MediaUploadFile | null> {
   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (status !== "granted") {
