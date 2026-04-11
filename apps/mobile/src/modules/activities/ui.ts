@@ -4,7 +4,12 @@ export type QuestionType = "dissertativa" | "multipla_escolha";
 export type SubmissionStatus = "pending" | "in_progress" | "submitted" | "reviewed";
 
 export function activityKindBehaviorLabel(kind: ActivityKind) {
-  return kind === "trabalho" ? "Entrega com anexo" : "Tarefa com questões";
+  const labels: Record<ActivityKind, string> = {
+    prova: "Prova",
+    atividade: "Atividade",
+    trabalho: "Trabalho",
+  };
+  return labels[kind];
 }
 
 export function activityStatusLabel(status: string) {

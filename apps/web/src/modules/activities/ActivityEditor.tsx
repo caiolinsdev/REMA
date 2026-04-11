@@ -234,9 +234,9 @@ export function ActivityEditor({ mode, activityId }: Props) {
                 }}
                 style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
               >
-                <option value="prova">Tarefa com questões</option>
-                <option value="atividade">Tarefa com questões</option>
-                <option value="trabalho">Tarefa com anexo</option>
+                <option value="prova">Prova</option>
+                <option value="atividade">Atividade</option>
+                <option value="trabalho">Trabalho</option>
               </select>
             </label>
             <p style={{ margin: 0, color: "#64748b", lineHeight: 1.6 }}>
@@ -444,7 +444,7 @@ export function ActivityEditor({ mode, activityId }: Props) {
           </section>
         ) : (
           <section style={panelStyle}>
-            <h2 style={{ marginTop: 0 }}>Tarefa com anexo</h2>
+            <h2 style={{ marginTop: 0 }}>Trabalho</h2>
             <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: 0 }}>
               Nesta primeira versão, tarefas com anexo usam descrição e prazo, sem editor de questões.
             </p>

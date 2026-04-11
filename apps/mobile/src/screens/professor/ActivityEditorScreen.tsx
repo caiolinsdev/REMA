@@ -75,9 +75,9 @@ function formatDueLabel(ms: number | null) {
 }
 
 const KIND_OPTIONS: { value: "prova" | "atividade" | "trabalho"; label: string }[] = [
-  { value: "prova", label: "Tarefa com questões (prova)" },
-  { value: "atividade", label: "Tarefa com questões (atividade)" },
-  { value: "trabalho", label: "Tarefa com anexo" },
+  { value: "prova", label: "Prova" },
+  { value: "atividade", label: "Atividade" },
+  { value: "trabalho", label: "Trabalho" },
 ];
 
 export function ActivityEditorScreen() {
@@ -478,7 +478,7 @@ export function ActivityEditorScreen() {
         </View>
       ) : (
         <View style={styles.panel}>
-          <Text style={styles.panelTitle}>Tarefa com anexo</Text>
+          <Text style={styles.panelTitle}>Trabalho</Text>
           <MutedText>
             Nesta versão, tarefas com anexo usam descrição e prazo, sem editor de questões no app.
           </MutedText>
